@@ -11,7 +11,7 @@ def objective(step, alpha, beta):
 
 def evaluate(params, n_iterations):
     print(params)
-    loss = 1 - env.env_input(params = params)
+    loss = 100 - env.env_input(params = params)
     return loss
     # loss = 0.0
     # for i in range(int(n_iterations)):
