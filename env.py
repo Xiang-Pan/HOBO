@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:56:14
-LastEditTime: 2021-07-22 16:49:11
+LastEditTime: 2021-07-22 18:37:53
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/env.py
@@ -27,7 +27,7 @@ class IVF_FLAT_build_config(object):
 
     # nprobe = 16
 class IVF_FLAT_search_config(object):
-    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 0, 20)
+    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 0, 2048)
     configspace = cs.ConfigurationSpace([nprobe], seed=123)
     
 
@@ -151,7 +151,8 @@ class ENV():
         
 
     def build_default_index(self):
-        self.client.create_index(self.collection_name, self.index_type, self.default_build_config)
+        build_info = self.client.create_index(self.collection_name, self.index_type, self.default_build_config)
+        print(build_info)
 
 
     def get_groundtruth(self):
@@ -172,9 +173,8 @@ class ENV():
         return avg_recall
     
     def env_build_input(self, params):
-        self.client.create_index(self.collection_name, self.index_type, params)
-        
-
+        build_info = self.client.create_index(self.collection_name, self.index_type, params)
+        # print(build_info)
 
     def env_search_input(self, params):
         start_time = time.time()
@@ -182,7 +182,7 @@ class ENV():
         end_time = time.time()
         query_time = (end_time - start_time)
         query_num = self.query_vectors.shape[0]
-        print(query_time)
+        # print(query_time)
         # print()
         query_per_sec = query_num/query_time
         # query_per_sec = 0

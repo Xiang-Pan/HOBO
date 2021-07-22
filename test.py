@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-07-22 16:47:01
+LastEditTime: 2021-07-22 18:37:08
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/test.py
@@ -30,9 +30,9 @@ def sign(x, threshold):
         return 100000 * (threshold - x)
 
 
-# min_loss = 99999
-# min_loss_recall = -1
-# min_loss_query_per_sec = -1
+min_loss = 9999999999999
+min_loss_recall = -1
+min_loss_query_per_sec = -1
 
 
 def build_evaluate(params, n_iterations):
@@ -47,8 +47,8 @@ def build_evaluate(params, n_iterations):
 
 def search_evaluate(params, n_iterations):
     recall, query_per_sec = env.env_search_input(params = params)
-    threshold = 90 
-    loss = sign(recall, threshold)+ query_per_sec
+    threshold = 95 
+    loss = sign(recall, threshold) 
     global min_loss
     global min_loss_recall
     global min_loss_query_per_sec
@@ -56,7 +56,7 @@ def search_evaluate(params, n_iterations):
     #     min_loss = loss
     #     min_loss_recall = recall
     #     min_loss_query_per_sec = query_per_sec
-    # print(params, recall, query_per_sec, loss)
+    print(params, recall, query_per_sec, loss)
     return loss
 
 if __name__ == '__main__':
@@ -80,7 +80,6 @@ if __name__ == '__main__':
         opt = BOHB(env.search_configspace, search_evaluate, max_budget=10, min_budget=1)
         logs = opt.optimize()
         print(logs)
-
         # reimplement best op
         recall, query_per_sec = env.env_search_input(logs.best['hyperparameter'].to_dict())
         print(recall,query_per_sec)
