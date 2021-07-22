@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-07-22 16:43:13
+LastEditTime: 2021-07-22 16:47:01
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/test.py
@@ -52,11 +52,11 @@ def search_evaluate(params, n_iterations):
     global min_loss
     global min_loss_recall
     global min_loss_query_per_sec
-    if loss < min_loss:
-        min_loss = loss
-        min_loss_recall = recall
-        min_loss_query_per_sec = query_per_sec
-    print(params, recall, query_per_sec, loss)
+    # if loss < min_loss:
+    #     min_loss = loss
+    #     min_loss_recall = recall
+    #     min_loss_query_per_sec = query_per_sec
+    # print(params, recall, query_per_sec, loss)
     return loss
 
 if __name__ == '__main__':
