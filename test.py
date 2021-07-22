@@ -1,12 +1,13 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-07-22 07:19:08
+LastEditTime: 2021-07-22 16:43:13
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/test.py
 xiangpan@nyu.edu
 '''
+
 from bohb import BOHB
 import bohb.configspace as cs
 from option import *
@@ -17,7 +18,6 @@ import sys
 
 # def objective(step, alpha, beta):
 #     return 1 / (alpha * step + 0.1) + beta
-
     # loss = 0.0
     # for i in range(int(n_iterations)):
     #     loss += objective(**params, step=i)
@@ -30,41 +30,19 @@ def sign(x, threshold):
         return 100000 * (threshold - x)
 
 
-min_loss = 99999
-min_loss_recall = -1
-min_loss_query_per_sec = -1
-
+# min_loss = 99999
+# min_loss_recall = -1
+# min_loss_query_per_sec = -1
 
 
 def build_evaluate(params, n_iterations):
     env.env_build_input(params = params)
-
-
-    # env.build_default_index()
     search_opt = BOHB(env.search_configspace, search_evaluate, max_budget=n_iterations, min_budget=1)
     logs = search_opt.optimize()
     # print(logs)
     return logs.best['loss']
-    # print(min_loss,min_loss_recall,min_loss_query_per_sec)
-    # recall, query_per_sec = env.env_search_input(params = params)
-    # threshold = 90 
-    # loss = sign(recall, threshold)+ query_per_sec
-    # global min_loss
-    # global min_loss_recall
-    # global min_loss_query_per_sec
-    # if loss < min_loss:
-    #     min_loss = loss
-    #     min_loss_recall = recall
-    #     min_loss_query_per_sec = query_per_sec
-    # print(params, recall, query_per_sec, loss)
-    # epoch_best_loss = sys.maxint
-    
-    # for i in range(n_iterations):
-    #     recall, query_per_sec = env.env_search_input(params = params)
-    #     threshold = 90 
-    #     loss = sign(recall, threshold)+ query_per_sec
-    #     epoch_best_loss = min(epoch_best_loss, loss)
-    # return epoch_best_loss
+
+
 
 
 def search_evaluate(params, n_iterations):
