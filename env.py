@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:56:14
-LastEditTime: 2021-07-22 07:06:14
+LastEditTime: 2021-07-22 16:49:11
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/env.py
@@ -13,11 +13,8 @@ import numpy as np
 import random
 import bohb.configspace as cs
 import json
-# import datetime
 from milvus import Milvus, MetricType, IndexType
 
-# SERVER_ADDR = '127.0.0.1'
-# SERVER_PORT = '19530'
 
 class IVF_FLAT_default_build_config(object):
     def __init__(self):
