@@ -1,7 +1,7 @@
 <!--
  * @Author: Xiang Pan
  * @Date: 2021-07-10 00:23:34
- * @LastEditTime: 2021-07-22 16:52:54
+ * @LastEditTime: 2021-07-22 20:31:22
  * @LastEditors: Xiang Pan
  * @Description: 
  * @FilePath: /HOBO/README.md
@@ -26,7 +26,7 @@ HNSW
 
 ## python run
 ```
-python test.py --index_type IVF_FLAT --op build
+python bohb_op.py --index_type IVF_FLAT --op build --threshold 95
 ```
 
 ## monitor setup
