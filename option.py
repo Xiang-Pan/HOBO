@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-22 04:32:22
-LastEditTime: 2021-07-22 06:57:07
+LastEditTime: 2021-07-22 18:44:11
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/option.py
@@ -16,6 +16,7 @@ def str2bool(str):
 parser = argparse.ArgumentParser()
 parser.add_argument('--index_type', default = "IVF_FLAT",required=False,)
 parser.add_argument('--op', default = "search",  required=False,)
+parser.add_argument('--threshold', type = int, default = 100,  required=False,)
 
 
 

@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:56:14
-LastEditTime: 2021-07-22 18:37:53
+LastEditTime: 2021-07-22 18:38:34
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/env.py
@@ -45,9 +45,6 @@ class IVF_PQ_build_config(object):
 class IVF_PQ_search_config(object):
     nprobe =  cs.IntegerUniformHyperparameter('nprobe', 0, 20)
     configspace = cs.ConfigurationSpace([nprobe], seed=123)
-
-
-
 
 class HNSW_default_build_config(object):
     M = 24
@@ -182,10 +179,7 @@ class ENV():
         end_time = time.time()
         query_time = (end_time - start_time)
         query_num = self.query_vectors.shape[0]
-        # print(query_time)
-        # print()
         query_per_sec = query_num/query_time
-        # query_per_sec = 0
         # print(statue)
         if len(res) == 0:
             return 0, query_per_sec

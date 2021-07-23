@@ -1,10 +1,10 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-07-22 18:37:08
+LastEditTime: 2021-07-22 18:46:03
 LastEditors: Xiang Pan
 Description: 
-FilePath: /HOBO/test.py
+FilePath: /HOBO/bohb_op.py
 xiangpan@nyu.edu
 '''
 
@@ -33,6 +33,7 @@ def sign(x, threshold):
 min_loss = 9999999999999
 min_loss_recall = -1
 min_loss_query_per_sec = -1
+threshold = 90
 
 
 def build_evaluate(params, n_iterations):
@@ -47,7 +48,7 @@ def build_evaluate(params, n_iterations):
 
 def search_evaluate(params, n_iterations):
     recall, query_per_sec = env.env_search_input(params = params)
-    threshold = 95 
+    # threshold = 95 
     loss = sign(recall, threshold) 
     global min_loss
     global min_loss_recall
@@ -63,6 +64,7 @@ if __name__ == '__main__':
 
     args = get_option()
     env = ENV(args = args)
+    threshold = args.threshold
     if args.op == "build":
         opt = BOHB(env.build_configspace, build_evaluate, max_budget=10, min_budget=1)
         logs = opt.optimize()
