@@ -1,12 +1,3 @@
-'''
-Author: Xiang Pan
-Date: 2021-07-09 23:56:14
-LastEditTime: 2021-07-22 18:38:34
-LastEditors: Xiang Pan
-Description: 
-FilePath: /HOBO/env.py
-xiangpan@nyu.edu
-'''
 import os
 import time
 import numpy as np
@@ -22,24 +13,24 @@ class IVF_FLAT_default_build_config(object):
 
 
 class IVF_FLAT_build_config(object):
-    nlist =  cs.IntegerUniformHyperparameter('nlist', 0, 65535)
+    nlist =  cs.IntegerUniformHyperparameter('nlist', 0, 16384)
     configspace = cs.ConfigurationSpace([nlist], seed=123)
 
     # nprobe = 16
 class IVF_FLAT_search_config(object):
-    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 0, 2048)
+    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 0, 2048) #UPDATE BASED ON 0.1*BUILD IF "build"
     configspace = cs.ConfigurationSpace([nprobe], seed=123)
     
 
 class IVF_PQ_default_build_config(object):
     def __init__(self):
         self.nlist  = 2048
-        self.M = 16
+        self.M = 16 
     # nbits = 8
 
 class IVF_PQ_build_config(object):
-    nlist =  cs.IntegerUniformHyperparameter('nlist', 0, 65535)
-    M =  cs.IntegerUniformHyperparameter('M', 0, 16)
+    nlist =  cs.IntegerUniformHyperparameter('nlist', 0, 16384)
+    M =  cs.IntegerUniformHyperparameter('M', 0, 16) #(1, ?) NEED TO DIVIDE DATA DIM!!!
     configspace = cs.ConfigurationSpace([nlist, M], seed=123)
 
 class IVF_PQ_search_config(object):
@@ -57,8 +48,8 @@ class HNSW_build_config(object):
     configspace = cs.ConfigurationSpace([M, efConstruction], seed=123)
 
 class HNSW_search_config(object):
-    top_k = 64
-    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 0, 32768)
+    top_k = 64 #trace it back!!
+    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 8, 512)# efsearch? ASK WEIZHI; (8, 512)
     configspace = cs.ConfigurationSpace([nprobe], seed=123)
 
 class IVF_SQ8_default_build_config(object):
@@ -67,12 +58,12 @@ class IVF_SQ8_default_build_config(object):
     nprobe = 16
 
 class IVF_SQ8_build_config(object):
-    nlist =  cs.IntegerUniformHyperparameter('nlist', 1, 65535)
+    nlist =  cs.IntegerUniformHyperparameter('nlist', 1, 16384) #SAME AS FLAT
     configspace = cs.ConfigurationSpace([nlist], seed=123)
     
 
 class IVF_SQ8_search_config(object):
-    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 0, 32768)
+    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 0, 2048)
     configspace = cs.ConfigurationSpace([nprobe], seed=123)
     
 
