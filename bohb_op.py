@@ -1,18 +1,20 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-07-22 18:46:03
+LastEditTime: 2021-07-23 22:35:45
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/bohb_op.py
 xiangpan@nyu.edu
 '''
-
+import wandb
 from bohb import BOHB
 import bohb.configspace as cs
 from option import *
 from env import ENV
 import sys
+
+args = get_option()
 
 
 
@@ -46,8 +48,16 @@ def build_evaluate(params, n_iterations):
 
 
 
+
 def search_evaluate(params, n_iterations):
     recall, query_per_sec = env.env_search_input(params = params)
+
+    if args.wandb_log:
+        wandb.log({"recall": recall})
+        wandb.log({"query_per_sec": query_per_sec})
+        for k,v in params.items():
+            wandb.log({k: v})
+        
     # threshold = 95 
     loss = sign(recall, threshold) 
     global min_loss
@@ -62,9 +72,11 @@ def search_evaluate(params, n_iterations):
 
 if __name__ == '__main__':
 
-    args = get_option()
+    
     env = ENV(args = args)
     threshold = args.threshold
+    if args.wandb_log:
+        wandb.init()
     if args.op == "build":
         opt = BOHB(env.build_configspace, build_evaluate, max_budget=10, min_budget=1)
         logs = opt.optimize()

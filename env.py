@@ -11,7 +11,6 @@ class IVF_FLAT_default_build_config(object):
     def __init__(self):
         self.nlist = 2048
 
-
 class IVF_FLAT_build_config(object):
     nlist =  cs.IntegerUniformHyperparameter('nlist', 0, 16384)
     configspace = cs.ConfigurationSpace([nlist], seed=123)
@@ -137,11 +136,9 @@ class ENV():
         self.search_configspace = get_search_configspace(args.index_type)
         self.build_configspace = get_build_configspace(args.index_type)
         
-
     def build_default_index(self):
         build_info = self.client.create_index(self.collection_name, self.index_type, self.default_build_config)
         print(build_info)
-
 
     def get_groundtruth(self):
         groundtruth = np.load("./cached_datasets/siftsmall_numpy/siftsmall_groundtruth.npy") #! NEED modified to name-based
