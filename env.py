@@ -109,14 +109,17 @@ def get_default_build_configspace(index_type):
 
 
 def get_build_configspace(index_type):
-    if index_type == "IVF_FLAT":
+    # print(index_type)
+    if index_type == "IVF_FLAT" or index_type == IndexType.IVF_FLAT:
         return IVF_FLAT_build_config().configspace
-    if index_type == "IVF_PQ":
+    if index_type == "IVF_PQ" or index_type == IndexType.IVF_PQ:
         return IVF_PQ_build_config().configspace
-    if index_type == "IVF_SQ8":
+    if index_type == "IVF_SQ8" or index_type == IndexType.IVF_SQ8:
         return IVF_SQ8_build_config().configspace
-    if index_type == "HNSW":
+    if index_type == "HNSW" or index_type == IndexType.HNSW:
         return HNSW_build_config().configspace
+
+# 
 
     
 
@@ -135,6 +138,11 @@ class ENV():
         self.default_build_config = get_default_build_config(args.index_type)
         self.search_configspace = get_search_configspace(args.index_type)
         self.build_configspace = get_build_configspace(args.index_type)
+
+    def get_build_configspace(self):
+        self.build_configspace = get_build_configspace(self.index_type)
+        print(self.build_configspace)
+        return self.build_configspace
         
     def build_default_index(self):
         build_info = self.client.create_index(self.collection_name, self.index_type, self.default_build_config)
@@ -159,6 +167,9 @@ class ENV():
     
     def env_build_input(self, params):
         build_info = self.client.create_index(self.collection_name, self.index_type, params)
+    
+    def set_build_index_type(self, index_type):
+        self.index_type = index_type
         # print(build_info)
 
     def env_search_input(self, params):
