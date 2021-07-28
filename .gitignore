@@ -3,4 +3,5 @@ bohb-hpo/
 **/.ipynb_checkpoints
 **/monitor/
 **/back/
+wandb/
 
