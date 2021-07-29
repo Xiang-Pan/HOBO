@@ -6,6 +6,7 @@ import bohb.configspace as cs
 import json
 from milvus import Milvus, MetricType, IndexType
 
+gDataDim = 512
 
 class IVF_FLAT_default_build_config(object):
     def __init__(self):
@@ -29,7 +30,8 @@ class IVF_PQ_default_build_config(object):
 
 class IVF_PQ_build_config(object):
     nlist =  cs.IntegerUniformHyperparameter('nlist', 0, 16384)
-    M =  cs.IntegerUniformHyperparameter('M', 0, 16) #(1, ?) NEED TO DIVIDE DATA DIM!!!
+    # M =  cs.IntegerUniformHyperparameter('M', 1, 16) #(1, ?) NEED TO DIVIDE DATA DIM!!!
+    M = cs.CategoricalHyperparameter('M', [i for i in range(1,16) if gDataDim%i == 0]) # TODO: remember to modify gDataDim
     configspace = cs.ConfigurationSpace([nlist, M], seed=123)
 
 class IVF_PQ_search_config(object):
@@ -59,14 +61,13 @@ class IVF_SQ8_default_build_config(object):
 class IVF_SQ8_build_config(object):
     nlist =  cs.IntegerUniformHyperparameter('nlist', 1, 16384) #SAME AS FLAT
     configspace = cs.ConfigurationSpace([nlist], seed=123)
-    
 
 class IVF_SQ8_search_config(object):
     nprobe =  cs.IntegerUniformHyperparameter('nprobe', 0, 2048)
     configspace = cs.ConfigurationSpace([nprobe], seed=123)
     
 
-
+# TODO: can op to dict
 def get_index_type(index_type):
     if index_type == "IVF_FLAT":
         return IndexType.IVF_FLAT
@@ -76,6 +77,18 @@ def get_index_type(index_type):
         return IndexType.IVF_SQ8
     if index_type == "HNSW":
         return IndexType.HNSW
+
+def get_index_str(index_type):
+    if index_type == IndexType.IVF_FLAT:
+        return "IVF_FLAT"
+    if index_type == IndexType.IVF_PQ:
+        return "IVF_PQ" 
+    if index_type == IndexType.IVF_SQ8:
+        return "IVF_SQ8"
+    if index_type == IndexType.HNSW:
+        return "HNSW"
+
+
 
 def get_default_build_config(index_type):
     if index_type == "IVF_FLAT":
@@ -133,15 +146,13 @@ class ENV():
         self.query_groundtruth = self.get_groundtruth()
         self.query_vectors = self.get_query()
         self.top_k = 100
-        self.index_type = get_index_type(args.index_type)
-        print(args.index_type)
+        self.index_type = get_index_type(args.index_type)           # enum type
         self.default_build_config = get_default_build_config(args.index_type)
         self.search_configspace = get_search_configspace(args.index_type)
         self.build_configspace = get_build_configspace(args.index_type)
 
     def get_build_configspace(self):
         self.build_configspace = get_build_configspace(self.index_type)
-        print(self.build_configspace)
         return self.build_configspace
         
     def build_default_index(self):
