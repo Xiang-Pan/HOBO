@@ -162,7 +162,6 @@ class ENV():
         
     def build_default_index(self):
         build_info = self.client.create_index(self.collection_name, self.index_type, self.default_build_config)
-        # print(build_info)
 
     def get_groundtruth(self):
         groundtruth = np.load("./cached_datasets/siftsmall_numpy/siftsmall_groundtruth.npy") #! NEED modified to name-based
