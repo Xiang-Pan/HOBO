@@ -201,9 +201,13 @@ class ENV():
             return 0, query_per_sec
         else:
             converted_res = np.zeros(res.shape)
-            for i in range(len(res)):
-                for j in range(len(res[i])):
-                    converted_res[i][j] = res[i][j].id
+            def convert(x):
+                return x.id
+            convert_vec = np.vectorize(convert)
+            converted_res = convert_vec(np.array(res))
+            # for i in range(len(res)):
+            #     for j in range(len(res[i])):
+            #         converted_res[i][j] = res[i][j].id
             return self.get_avg_recall(converted_res, self.query_groundtruth), query_per_sec
 
 
