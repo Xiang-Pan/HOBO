@@ -1,0 +1,14 @@
+program: grid_search.py
+method: grid
+metric:
+  goal: minimize
+  name: loss
+parameters:
+  index_type:
+    values: [IndexType.IVF_FLAT]
+  build_nprobe:
+    min: 1
+    max: 1024
+  search_nlist:
+    min: 1
+    max: 1024

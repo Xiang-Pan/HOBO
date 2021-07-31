@@ -1,7 +1,7 @@
 <!--
  * @Author: Xiang Pan
  * @Date: 2021-07-10 00:23:34
- * @LastEditTime: 2021-07-22 20:31:22
+ * @LastEditTime: 2021-07-30 22:14:43
  * @LastEditors: Xiang Pan
  * @Description: 
  * @FilePath: /HOBO/README.md
@@ -36,3 +36,9 @@ metric:
   address: <your_IP_address>   # Set the IP address of Pushgateway.
   port: 9091                   # Set the port number of Pushgateway.
 ```
+
+grid search 
+ef
+HNSW
+
+# 07/30 Update

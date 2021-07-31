@@ -49,9 +49,10 @@ class HNSW_build_config(object):
     configspace = cs.ConfigurationSpace([M, efConstruction], seed=123)
 
 class HNSW_search_config(object):
-    top_k = 64 #trace it back!!
-    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 8, 512)# efsearch? ASK WEIZHI; (8, 512)
-    configspace = cs.ConfigurationSpace([nprobe], seed=123)
+    top_k = 100 #trace it back!!
+    # nprobe =  cs.IntegerUniformHyperparameter('nprobe', 8, 512)# efsearch? ASK WEIZHI; (8, 512)
+    ef =  cs.IntegerUniformHyperparameter('ef', top_k, 512)          # efsearch? ASK WEIZHI; (8, 512)
+    configspace = cs.ConfigurationSpace([ef], seed=123)
 
 class IVF_SQ8_default_build_config(object):
     nlist = 2048
@@ -91,33 +92,33 @@ def get_index_str(index_type):
 
 
 def get_default_build_config(index_type):
-    if index_type == "IVF_FLAT":
+    if index_type == IndexType.IVF_FLAT:
         return IVF_FLAT_default_build_config().__dict__
-    if index_type == "IVF_PQ":
+    if index_type == IndexType.IVF_PQ:
         return IVF_PQ_default_build_config().__dict__
-    if index_type == "IVF_SQ8":
+    if index_type == IndexType.IVF_SQ8:
         return IVF_SQ8_default_build_config().__dict__
-    if index_type == "HNSW":
+    if index_type == IndexType.HNSW:
         return HNSW_default_build_config().__dict__
 
 def get_search_configspace(index_type):
-    if index_type == "IVF_FLAT":
+    if index_type == IndexType.IVF_FLAT:
         return IVF_FLAT_search_config().configspace
-    if index_type == "IVF_PQ":
+    if index_type == IndexType.IVF_PQ:
         return IVF_PQ_search_config().configspace
-    if index_type == "IVF_SQ8":
+    if index_type == IndexType.IVF_SQ8:
         return IVF_SQ8_search_config().configspace
-    if index_type == "HNSW":
+    if index_type == IndexType.HNSW:
         return HNSW_search_config().configspace
 
 def get_default_build_configspace(index_type):
-    if index_type == "IVF_FLAT":
+    if index_type == IndexType.IVF_FLAT:
         return IVF_FLAT_default_build_config().configspace
-    if index_type == "IVF_PQ":
+    if index_type == IndexType.IVF_PQ:
         return IVF_PQ_default_build_config().configspace
-    if index_type == "IVF_SQ8":
+    if index_type == IndexType.IVF_SQ8:
         return IVF_SQ8_default_build_config().configspace
-    if index_type == "HNSW":
+    if index_type == IndexType.HNSW:
         return HNSW_default_build_config().configspace
 
 
@@ -137,7 +138,7 @@ def get_build_configspace(index_type):
     
 
 class ENV():
-    def __init__(self, args):
+    def __init__(self, args = None):
         print("ENV")
         host = '127.0.0.1'
         port = '19530'
@@ -146,10 +147,14 @@ class ENV():
         self.query_groundtruth = self.get_groundtruth()
         self.query_vectors = self.get_query()
         self.top_k = 100
-        self.index_type = get_index_type(args.index_type)           # enum type
-        self.default_build_config = get_default_build_config(args.index_type)
-        self.search_configspace = get_search_configspace(args.index_type)
-        self.build_configspace = get_build_configspace(args.index_type)
+
+        # get status by curretn db 
+        self.refresh_status()
+
+        self.default_build_config = get_default_build_config(self.index_type)
+        self.search_configspace = get_search_configspace(self.index_type)
+        self.build_configspace = get_build_configspace(self.index_type)
+        # print(self.default_build_config)
 
     def get_build_configspace(self):
         self.build_configspace = get_build_configspace(self.index_type)
@@ -157,7 +162,7 @@ class ENV():
         
     def build_default_index(self):
         build_info = self.client.create_index(self.collection_name, self.index_type, self.default_build_config)
-        print(build_info)
+        # print(build_info)
 
     def get_groundtruth(self):
         groundtruth = np.load("./cached_datasets/siftsmall_numpy/siftsmall_groundtruth.npy") #! NEED modified to name-based
@@ -178,12 +183,14 @@ class ENV():
     
     def env_build_input(self, params):
         build_info = self.client.create_index(self.collection_name, self.index_type, params)
+        self.refresh_status()
     
     def set_build_index_type(self, index_type):
         self.index_type = index_type
         # print(build_info)
 
     def env_search_input(self, params):
+        self.search_params = params
         start_time = time.time()
         statue, res = self.client.search(self.collection_name, top_k = self.top_k, query_records = self.query_vectors, params = params)
         end_time = time.time()
@@ -200,4 +207,29 @@ class ENV():
                     converted_res[i][j] = res[i][j].id
             return self.get_avg_recall(converted_res, self.query_groundtruth), query_per_sec
 
+
+    def refresh_status(self):
+        status, stats = self.client.get_index_info(self.collection_name)
+        self.index_type = stats._index_type
+        self.index_params = stats._params
+
+
+    # given full env put
+    def env_input(self, config):
+        # check current index type
+        is_build = False
+
+        self.refresh_status()
         
+        if self.index_type != config.index_type:
+            # self.index_type = config.index_type
+            is_build = True
+        elif self.index_params != config.index_params:
+            is_build = True
+        
+        if is_build:
+            self.env_build_input(self.index_params)
+        
+        # begin search 
+        recall, query_per_sec = self.env_search_input(config.search_params)
+        return recall, query_per_sec
