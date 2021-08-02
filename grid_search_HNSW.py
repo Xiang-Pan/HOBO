@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-02 15:36:15
+LastEditTime: 2021-08-02 15:37:35
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_HNSW.py
@@ -33,6 +33,10 @@ if __name__ == "__main__":
     args.build_M = -1
     args.build_efConstruction = -1
     args.search_ef = -1
+
+    # name = get_exp_name(args)
+    run = wandb.init()
+    wandb.run.name = "HNSW_gird_search"
 
     config = convert_config(args)
     run = wandb.init()

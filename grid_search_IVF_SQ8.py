@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-02 15:36:27
+LastEditTime: 2021-08-02 15:38:15
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_IVF_SQ8.py
@@ -31,6 +31,9 @@ if __name__ == "__main__":
     args.index_type = 'IVF_SQ8'
     args.build_nlist = -1
     args.search_nprobe = -1
+
+    run = wandb.init()
+    wandb.run.name = "IVF_SQ8_gird_search"
 
     config = convert_config(args)
     run = wandb.init()

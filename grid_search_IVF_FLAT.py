@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-02 15:36:20
+LastEditTime: 2021-08-02 15:37:42
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_IVF_FLAT.py
@@ -23,6 +23,9 @@ if __name__ == "__main__":
     args.index_type = 'IVF_FLAT'
     args.build_nlist = -1
     args.search_nprobe = -1
+
+    run = wandb.init()
+    wandb.run.name = "IVF_FLAT_gird_search"
 
     config = convert_config(args)
     run = wandb.init()
