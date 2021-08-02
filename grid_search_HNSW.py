@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-02 16:35:45
+LastEditTime: 2021-08-02 17:21:53
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_HNSW.py
@@ -45,7 +45,6 @@ if __name__ == "__main__":
 
     target_index_params = config['index_params']
     target_search_params = config['search_params']
-    print(config)
 
     cols = ["index_type"] + list(target_index_params.keys()) + list(target_search_params.keys()) + ["recall", "query_per_sec", "loss"] 
     table = wandb.Table(columns = cols)    

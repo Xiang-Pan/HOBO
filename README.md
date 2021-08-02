@@ -1,7 +1,7 @@
 <!--
  * @Author: Xiang Pan
  * @Date: 2021-07-10 00:23:34
- * @LastEditTime: 2021-08-02 12:38:00
+ * @LastEditTime: 2021-08-02 17:20:58
  * @LastEditors: Xiang Pan
  * @Description: 
  * @FilePath: /HOBO/README.md
@@ -39,11 +39,13 @@ metric:
   port: 9091                   # Set the port number of Pushgateway.
 ```
 
-grid search 
-ef
-HNSW
 
-# 07/30 Update
+# Grid Search 
+## siftsmall
+HNSW     https://wandb.ai/xiang-pan/HOBO/runs/3vdvm6gs  
+IVF_SQ8  https://wandb.ai/xiang-pan/HOBO/runs/26z6cea5  
+IVF_FLAT https://wandb.ai/xiang-pan/HOBO/runs/22n2lk07  
+IVF_PQ  https://wandb.ai/xiang-pan/HOBO/runs/22mj5iiv  
 
-IVF_FLAT https://wandb.ai/xiang-pan/HOBO/runs/30tjlhbr
-How to implement a auto grid search tool
+# TODO
+TODO :How to implement a auto grid search tool
