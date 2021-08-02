@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-02 15:37:57
+LastEditTime: 2021-08-02 15:41:48
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_IVF_PQ.py
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     # step = 10
     for nlist in range(1,16384,10):
         for M in [i for i in range(1,16) if gDataDim%i == 0]:
-            for nprobe in [1, 0.1*nlist, 10]:
+            for nprobe in [1, int(0.1*nlist), 10]:
                 config['index_params']['nlist'] = nlist
                 config['index_params']['M'] = M
                 config['search_params']['nprobe'] = nprobe

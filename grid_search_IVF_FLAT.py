@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-02 15:37:42
+LastEditTime: 2021-08-02 15:41:41
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_IVF_FLAT.py
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     table = wandb.Table(columns = cols)    
 
     for i in range(1,16384,10):
-        for j in range(1,0.1*i,10):
+        for j in range(1, int(0.1*i),10):
             config['index_params']['nlist'] = i
             config['search_params']['nprobe'] = j
             

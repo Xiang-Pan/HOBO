@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-02 15:38:15
+LastEditTime: 2021-08-02 15:41:54
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_IVF_SQ8.py
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     table = wandb.Table(columns = cols)    
 
     for nlist in range(1,1024,10):
-        for nprobe in range(1, 0.1*nlist,10):
+        for nprobe in range(1, int(0.1*nlist),10):
             config['index_params']['nlist'] = 16384
             config['search_params']['nprobe'] = nprobe
             
