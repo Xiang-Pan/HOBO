@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-02 15:37:35
+LastEditTime: 2021-08-02 16:35:45
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_HNSW.py
@@ -51,15 +51,21 @@ if __name__ == "__main__":
     table = wandb.Table(columns = cols)    
     
     for M in range(4,64,10):
-        for efConstruction in range(8,512,10):
-            for ef in range(100,512,10):
+        for efConstruction in range(8,512,50):
+            for ef in range(100,32768,100):
                 config['index_params']['M'] = M
                 config['index_params']['efConstruction'] = efConstruction
                 config['search_params']['ef'] = ef
+
+                wandb.log(config['index_params'])
+                wandb.log(config['search_params'])
+
                 
                 recall , query_per_sec = env.config_input(config)
                 threshold = 95
                 loss = sign(recall, threshold) + query_per_sec
+
+
 
                 wandb.log({"recall": recall})
                 wandb.log({"query_per_sec": query_per_sec})

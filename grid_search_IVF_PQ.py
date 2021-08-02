@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-02 15:41:48
+LastEditTime: 2021-08-02 16:35:41
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_IVF_PQ.py
@@ -47,9 +47,9 @@ if __name__ == "__main__":
     table = wandb.Table(columns = cols)    
 
     # step = 10
-    for nlist in range(1,16384,10):
+    for nlist in range(1,16384,100):
         for M in [i for i in range(1,16) if gDataDim%i == 0]:
-            for nprobe in [1, int(0.1*nlist), 10]:
+            for nprobe in [1, int(0.1*nlist), 100]:
                 config['index_params']['nlist'] = nlist
                 config['index_params']['M'] = M
                 config['search_params']['nprobe'] = nprobe
@@ -57,7 +57,9 @@ if __name__ == "__main__":
                 recall , query_per_sec = env.config_input(config)
                 threshold = 95
                 loss = sign(recall, threshold) + query_per_sec
-
+                
+                wandb.log(config['index_params'])
+                wandb.log(config['search_params'])
                 wandb.log({"recall": recall})
                 wandb.log({"query_per_sec": query_per_sec})
                 wandb.log({"loss": loss})

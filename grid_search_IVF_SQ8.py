@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-02 15:41:54
+LastEditTime: 2021-08-02 16:36:43
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_IVF_SQ8.py
@@ -44,8 +44,8 @@ if __name__ == "__main__":
     cols = ["index_type"] + list(env.index_params.keys()) + list(env.search_params.keys()) + ["recall", "query_per_sec", "loss"] 
     table = wandb.Table(columns = cols)    
 
-    for nlist in range(1,1024,10):
-        for nprobe in range(1, int(0.1*nlist),10):
+    for nlist in range(1,16384,100):
+        for nprobe in range(1, int(0.1*nlist),100):
             config['index_params']['nlist'] = 16384
             config['search_params']['nprobe'] = nprobe
             
@@ -53,6 +53,8 @@ if __name__ == "__main__":
             threshold = 95
             loss = sign(recall, threshold) + query_per_sec
 
+            wandb.log(config['index_params'])
+            wandb.log(config['search_params'])
             wandb.log({"recall": recall})
             wandb.log({"query_per_sec": query_per_sec})
             wandb.log({"loss": loss})

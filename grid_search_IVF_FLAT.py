@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-02 15:41:41
+LastEditTime: 2021-08-02 16:36:59
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_IVF_FLAT.py
@@ -36,8 +36,8 @@ if __name__ == "__main__":
     cols = ["index_type"] + list(env.index_params.keys()) + list(env.search_params.keys()) + ["recall", "query_per_sec", "loss"] 
     table = wandb.Table(columns = cols)    
 
-    for i in range(1,16384,10):
-        for j in range(1, int(0.1*i),10):
+    for i in range(1,16384,100):
+        for j in range(1, int(0.1*i),100):
             config['index_params']['nlist'] = i
             config['search_params']['nprobe'] = j
             
@@ -45,6 +45,8 @@ if __name__ == "__main__":
             threshold = 95
             loss = sign(recall, threshold) + query_per_sec
 
+            wandb.log(config['index_params'])
+            wandb.log(config['search_params'])
             wandb.log({"recall": recall})
             wandb.log({"query_per_sec": query_per_sec})
             wandb.log({"loss": loss})
