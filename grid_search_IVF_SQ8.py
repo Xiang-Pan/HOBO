@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-02 19:25:07
+LastEditTime: 2021-08-02 19:25:38
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_IVF_SQ8.py
@@ -59,6 +59,7 @@ if __name__ == "__main__":
 
             wandb.log(config['index_params'])
             wandb.log(config['search_params'])
+            
             wandb.log({"recall": recall})
             wandb.log({"query_per_sec": query_per_sec})
             wandb.log({"loss": loss})
