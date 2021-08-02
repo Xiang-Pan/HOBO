@@ -8,6 +8,9 @@ from milvus import Milvus, MetricType, IndexType
 
 gDataDim = 512
 
+
+
+
 class IVF_FLAT_default_build_config(object):
     def __init__(self):
         self.nlist = 2048

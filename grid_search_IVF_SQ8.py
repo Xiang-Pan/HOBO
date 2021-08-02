@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-02 13:59:38
+LastEditTime: 2021-08-02 15:36:27
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_IVF_SQ8.py
@@ -48,7 +48,7 @@ if __name__ == "__main__":
             
             recall , query_per_sec = env.config_input(config)
             threshold = 95
-            loss = sign(recall, threshold) 
+            loss = sign(recall, threshold) + query_per_sec
 
             wandb.log({"recall": recall})
             wandb.log({"query_per_sec": query_per_sec})
