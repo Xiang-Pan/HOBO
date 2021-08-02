@@ -180,8 +180,8 @@ class ENV():
         avg_recall = recall_total/len(preds)
         return avg_recall
     
-    def env_build_input(self, params):
-        build_info = self.client.create_index(self.collection_name, self.index_type, params)
+    def env_build_input(self, build_type, params):
+        build_info = self.client.create_index(self.collection_name, build_type, params)
         self.refresh_status()
     
     def set_build_index_type(self, index_type):
@@ -201,13 +201,13 @@ class ENV():
             return 0, query_per_sec
         else:
             converted_res = np.zeros(res.shape)
-            def convert(x):
-                return x.id
-            convert_vec = np.vectorize(convert)
-            converted_res = convert_vec(np.array(res))
-            # for i in range(len(res)):
-            #     for j in range(len(res[i])):
-            #         converted_res[i][j] = res[i][j].id
+            # def convert(x):
+            #     return x.id
+            # convert_vec = np.vectorize(convert)
+            # converted_res = convert_vec(np.array(res))
+            for i in range(len(res)):
+                for j in range(len(res[i])):
+                    converted_res[i][j] = res[i][j].id
             return self.get_avg_recall(converted_res, self.query_groundtruth), query_per_sec
 
 
@@ -218,21 +218,24 @@ class ENV():
 
 
     # given full env put
-    def env_input(self, config):
+    def config_input(self, config):
         # check current index type
         is_build = False
 
         self.refresh_status()
         
-        if self.index_type != config.index_type:
-            # self.index_type = config.index_type
+        if self.index_type != config['index_type']:
             is_build = True
-        elif self.index_params != config.index_params:
+        elif self.index_params != config['index_params']:
             is_build = True
         
         if is_build:
-            self.env_build_input(self.index_params)
+            self.env_build_input(config['index_type'] ,config['index_params'])
+            self.refresh_status()
+            self.index_params = config['index_params']
         
         # begin search 
-        recall, query_per_sec = self.env_search_input(config.search_params)
+        recall, query_per_sec = self.env_search_input(config['search_params'])
+        self.search_params = config['search_params']
+        
         return recall, query_per_sec

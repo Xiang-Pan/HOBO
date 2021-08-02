@@ -1,7 +1,7 @@
 <!--
  * @Author: Xiang Pan
  * @Date: 2021-07-10 00:23:34
- * @LastEditTime: 2021-07-30 23:06:09
+ * @LastEditTime: 2021-08-02 12:38:00
  * @LastEditors: Xiang Pan
  * @Description: 
  * @FilePath: /HOBO/README.md
@@ -44,3 +44,6 @@ ef
 HNSW
 
 # 07/30 Update
+
+IVF_FLAT https://wandb.ai/xiang-pan/HOBO/runs/30tjlhbr
+How to implement a auto grid search tool

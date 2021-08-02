@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-07-30 23:03:46
+LastEditTime: 2021-08-02 13:55:40
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/bohb_op.py
@@ -16,17 +16,10 @@ from env import *
 from milvus import Milvus, MetricType, IndexType
 import sys
 import pandas as pd
+from utils import *
 
 args = get_option()
 table_dict = dict()
-
-
-def sign(x, threshold):
-    if x > threshold:
-        return x - threshold
-    else:
-        return 100000 * (threshold - x)
-
 
 min_loss = 9999999999999
 min_loss_recall = -1
@@ -65,7 +58,7 @@ def build_evaluate(params, n_iterations):
 def search_evaluate(params, n_iterations):
     recall, query_per_sec = env.env_search_input(params = params)
 
-    loss = sign(recall, threshold) 
+    loss = sign(recall, threshold) + query_per_sec 
 
     if args.wandb_log:
         wandb.log({"recall": recall})
@@ -94,6 +87,7 @@ def search_evaluate(params, n_iterations):
         table_dict[env.index_type].add_data(*data)
         if 'best' not in table_dict.keys() or loss < table_dict['best'].get_column("loss")[0]:
             cols = ["index_type"] + list(env.index_params.keys()) + list(env.search_params.keys()) + ["recall", "query_per_sec", "loss"] 
+            # data = list(env.index_params.values()) + list(env.search_params.values()) + [recall, query_per_sec, loss]
             table_dict['best'] = wandb.Table(columns = cols)
             data = [str(env.index_type)] + data 
             table_dict['best'].add_data(*data)
