@@ -1,7 +1,7 @@
 <!--
  * @Author: Xiang Pan
  * @Date: 2021-07-10 00:23:34
- * @LastEditTime: 2021-08-02 17:22:34
+ * @LastEditTime: 2021-08-02 19:55:32
  * @LastEditors: Xiang Pan
  * @Description: 
  * @FilePath: /HOBO/README.md
@@ -43,7 +43,7 @@ metric:
 # Grid Search 
 ## siftsmall
 HNSW     https://wandb.ai/xiang-pan/HOBO/runs/3vdvm6gs  
-IVF_SQ8  https://wandb.ai/xiang-pan/HOBO/runs/26z6cea5  
+IVF_SQ8  https://wandb.ai/xiang-pan/HOBO/runs/26z6cea5  (run locally, need rerun) 
 IVF_FLAT https://wandb.ai/xiang-pan/HOBO/runs/22n2lk07  
 IVF_PQ  https://wandb.ai/xiang-pan/HOBO/runs/22mj5iiv  
 
