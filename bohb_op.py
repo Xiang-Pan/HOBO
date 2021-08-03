@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-08-02 13:55:40
+LastEditTime: 2021-08-02 20:53:15
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/bohb_op.py
@@ -35,7 +35,7 @@ gCurSearchParam = None
 
 def build_type_evaluate(params, n_iterations):
 
-    env.index_type = params['index_type']
+    env.target_type = params['index_type']
     env.refresh_status()
     # env.set_build_index_type(params['index_type'])
 
@@ -45,7 +45,7 @@ def build_type_evaluate(params, n_iterations):
     return logs.best['loss']
 
 def build_evaluate(params, n_iterations):
-    env.env_build_input(params = params)
+    env.env_build_input(params = params, build_type = env.target_type)
 
     global gCurIndexParam
     gCurIndexParam = params
