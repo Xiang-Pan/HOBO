@@ -13,6 +13,3 @@ parameters:
       values: range(8,512,50)
   search_ef:
       values: range(100,32768,100)
-    # for M in range(4,64,10):
-        # for efConstruction in range(8,512,50):
-            # for ef in range(100,32768,100):

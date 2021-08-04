@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-04 03:55:15
+LastEditTime: 2021-08-04 03:58:20
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search.py
@@ -87,44 +87,10 @@ def dfs(a, l, depth):
             l.remove(i)
 
 if __name__ == "__main__":
-
-    # args.index_type = 'HNSW'
-    # args.build_M = -1
-    # args.build_efConstruction = -1
-    # args.search_ef = -1
-
-    # name = get_exp_name(args)
     run = wandb.init()
-
     wandb.run.name = args.grid_search_config
 
-    # config = convert_config(args)
-    run = wandb.init()
     env = ENV()
-
     dfs(params_list,[],0)
-    
-    
-    # for M in range(4,64,10):
-        # for efConstruction in range(8,512,50):
-            # for ef in range(100,32768,100):
-                # config['index_params']['M'] = M
-                # config['index_params']['efConstruction'] = efConstruction
-                # config['search_params']['ef'] = ef
 
-                # wandb.log(config['index_params'])
-                # wandb.log(config['search_params'])
-
-                
-                # recall , query_per_sec = env.config_input(config)
-                # threshold = 95
-                # loss = sign(recall, threshold) + query_per_sec
-
-                # wandb.log({"recall": recall})
-                # wandb.log({"query_per_sec": query_per_sec})
-                # wandb.log({"loss": loss})
-
-                # data = [str(config['index_type'])] +list(env.index_params.values()) + list(env.search_params.values()) + [recall, query_per_sec, loss]
-                # table.add_data(*data)
-            
     run.log({str(config['index_type']):table})
