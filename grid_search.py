@@ -1,10 +1,10 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-04 03:29:23
+LastEditTime: 2021-08-04 03:55:15
 LastEditors: Xiang Pan
 Description: 
-FilePath: /HOBO/grid_search_HNSW.py
+FilePath: /HOBO/grid_search.py
 xiangpan@nyu.edu
 '''
 import wandb
@@ -26,12 +26,38 @@ from utils import *
 #     ef =  cs.IntegerUniformHyperparameter('ef', top_k, 512)          # efsearch? ASK WEIZHI; (8, 512)
 #     configspace = cs.ConfigurationSpace([ef], seed=123)
 
+args = get_option()
 config = dict()
-name_list = []
-params_list = []
+config_file = yaml.load(open(args.grid_search_config))
+name_list = [name for name in config_file['parameters']]
+params_list = [config_file['parameters'][name]['values'] for name in config_file['parameters']]
+config['index_type'] = config_file['index_type']['values'][0]
+first = True
 
 
-def do_config():
+def input_config(config):
+    global first
+    global table
+    if first:
+        target_index_params = config['index_params']
+        target_search_params = config['search_params']
+
+        cols = ["index_type"] + list(target_index_params.keys()) + list(target_search_params.keys()) + ["recall", "query_per_sec", "loss"] 
+        table = wandb.Table(columns = cols)
+        first = False
+    wandb.log(config['index_params'])
+    wandb.log(config['search_params'])
+
+    recall , query_per_sec = env.config_input(config)
+    threshold = 95
+    loss = sign(recall, threshold) + query_per_sec
+
+    wandb.log({"recall": recall})
+    wandb.log({"query_per_sec": query_per_sec})
+    wandb.log({"loss": loss})
+
+    data = [str(config['index_type'])] +list(env.index_params.values()) + list(env.search_params.values()) + [recall, query_per_sec, loss]
+    table.add_data(*data)
     
 
 def dfs(a, l, depth):
@@ -45,8 +71,9 @@ def dfs(a, l, depth):
         for i in t:
             l.append(i)
             config[name_list[depth]] = i
-            # print(config)
-            do_config(config)
+            converted_config = convert_config(config)
+            # print(converted_config)
+            input_config(converted_config)
             l.remove(i)
     else:
         t = a[0]
@@ -59,28 +86,24 @@ def dfs(a, l, depth):
                 dfs(a[1:],l, depth+1)
             l.remove(i)
 
-
 if __name__ == "__main__":
-    args = get_option()
-    args.index_type = 'HNSW'
-    args.build_M = -1
-    args.build_efConstruction = -1
-    args.search_ef = -1
+
+    # args.index_type = 'HNSW'
+    # args.build_M = -1
+    # args.build_efConstruction = -1
+    # args.search_ef = -1
 
     # name = get_exp_name(args)
     run = wandb.init()
-    wandb.run.name = "HNSW_gird_search"
 
-    config = convert_config(args)
+    wandb.run.name = args.grid_search_config
+
+    # config = convert_config(args)
     run = wandb.init()
     env = ENV()
+
+    dfs(params_list,[],0)
     
-
-    target_index_params = config['index_params']
-    target_search_params = config['search_params']
-
-    cols = ["index_type"] + list(target_index_params.keys()) + list(target_search_params.keys()) + ["recall", "query_per_sec", "loss"] 
-    table = wandb.Table(columns = cols)    
     
     # for M in range(4,64,10):
         # for efConstruction in range(8,512,50):

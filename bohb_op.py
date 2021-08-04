@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-08-02 20:53:15
+LastEditTime: 2021-08-03 23:01:22
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/bohb_op.py
@@ -106,8 +106,6 @@ def get_exp_name(args):
         print("op error!")
         name = "error_run"
     return name
-    # print("op error!")
-    # return name 
 
 if __name__ == '__main__':
     env = ENV()
@@ -124,6 +122,7 @@ if __name__ == '__main__':
         print(type_logs)
 
     elif args.op == "build_param":
+        # env.target_build_type = get_index_type(args.index_type)
         opt = BOHB(env.build_configspace, build_evaluate, max_budget=10, min_budget=1)
         logs = opt.optimize()
         print(logs)
@@ -137,7 +136,7 @@ if __name__ == '__main__':
         
     else:
         # env.set_target_index_type()
-        # TODO: fix this by decouple target and current
+        # TODO: fix this by decoupling target and current
         env.index_type = get_index_type(args.index_type) # from str to enum
         env.build_default_index()
         opt = BOHB(env.search_configspace, search_evaluate, max_budget=10, min_budget=1)

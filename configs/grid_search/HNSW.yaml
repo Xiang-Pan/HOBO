@@ -1,0 +1,18 @@
+program: grid_search.py
+method: grid
+name: IVF_FLAT_search
+metric:
+  goal: minimize
+  name: loss
+index_type:
+  values: ["IVF_FLAT"]
+parameters:
+  build_M:
+      values: range(4,64,10)
+  build_efConstruction:
+      values: range(8,512,50)
+  search_ef:
+      values: range(100,32768,100)
+    # for M in range(4,64,10):
+        # for efConstruction in range(8,512,50):
+            # for ef in range(100,32768,100):
