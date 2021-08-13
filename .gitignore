@@ -4,4 +4,5 @@ bohb-hpo/
 **/monitor/
 **/back/
 wandb/
+cached_datasets/
 

@@ -1,7 +1,7 @@
 <!--
  * @Author: Xiang Pan
  * @Date: 2021-07-10 00:23:34
- * @LastEditTime: 2021-08-12 00:47:36
+ * @LastEditTime: 2021-08-12 16:17:36
  * @LastEditors: Xiang Pan
  * @Description: 
  * @FilePath: /HOBO/README.md
@@ -15,6 +15,11 @@ systemctl start docker
 docker run --name milvus_cpu_1.1.0 -d -p 19530:19530 -p 19121:19121 milvusdb/milvus:1.1.0-cpu-d050721-5e559c
 docker restart 6e7513d3203b  
 ```
+
+## supported dataset
+siftsmall
+sift
+
 
 ## supported index_type 
 ```
@@ -41,9 +46,9 @@ metric:
 
 
 # Grid Search 
-## siftsmall
+## ANN_SIFT10K
 HNSW     https://wandb.ai/xiang-pan/HOBO/runs/3vdvm6gs  
-IVF_SQ8  https://wandb.ai/xiang-pan/HOBO/runs/26z6cea5  (run locally, need rerun) 
+IVF_SQ8  https://wandb.ai/xiang-pan/HOBO/runs/26z6cea5  (run locally, need rerun)  
 IVF_FLAT https://wandb.ai/xiang-pan/HOBO/runs/22n2lk07  
 IVF_PQ  https://wandb.ai/xiang-pan/HOBO/runs/22mj5iiv  
 

@@ -1,4 +1,4 @@
-index_type, M, efConstruction, ef, recall, query_per_sec, loss
+index_type,M,efConstruction,ef,recall,query_per_sec,loss
 HNSW,4,8,100,61.1,10953.759369042335,3400953.7593690422
 HNSW,4,8,200,73.43,18579.419712070874,2175579.4197120704
 HNSW,4,8,300,78.42,18031.486178582178,1676031.4861785818

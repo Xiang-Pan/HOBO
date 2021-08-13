@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-22 04:32:22
-LastEditTime: 2021-08-04 03:48:21
+LastEditTime: 2021-08-13 17:41:58
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/option.py
@@ -20,6 +20,8 @@ parser.add_argument('--threshold', type = int, default = 100,  required=False,)
 parser.add_argument('--wandb_log', action = "store_true")
 
 parser.add_argument('--grid_search_config', default ="./configs/grid_search/HNSW.yaml")
+
+parser.add_argument('--collection_name', default ="siftsmall")
 # for grid search
 # parser.add_argument('--build_nlist', type = int, default = 100,  required=False,)
 # parser.add_argument('--search_nprobe', type = int, default = 100,  required=False,)

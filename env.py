@@ -29,7 +29,6 @@ class IVF_PQ_default_build_config(object):
     def __init__(self):
         self.nlist  = 2048
         self.M = 16 
-    # nbits = 8
 
 class IVF_PQ_build_config(object):
     nlist =  cs.IntegerUniformHyperparameter('nlist', 0, 16384)
@@ -42,8 +41,9 @@ class IVF_PQ_search_config(object):
     configspace = cs.ConfigurationSpace([nprobe], seed=123)
 
 class HNSW_default_build_config(object):
-    M = 24
-    efConstruction = 128
+    def __init__(self):
+        self.M = 24
+        self.efConstruction = 128
     # ef = 64
 
 class HNSW_build_config(object):
@@ -58,9 +58,10 @@ class HNSW_search_config(object):
     configspace = cs.ConfigurationSpace([ef], seed=123)
 
 class IVF_SQ8_default_build_config(object):
-    nlist = 2048
-    # QuantizerType = 8
-    nprobe = 16
+    def __init__(self):
+        self.nlist = 2048
+        # QuantizerType = 8
+        self.nprobe = 16
 
 class IVF_SQ8_build_config(object):
     nlist =  cs.IntegerUniformHyperparameter('nlist', 1, 16384) #SAME AS FLAT
@@ -126,7 +127,6 @@ def get_default_build_configspace(index_type):
 
 
 def get_build_configspace(index_type):
-    # print(index_type)
     if index_type == "IVF_FLAT" or index_type == IndexType.IVF_FLAT:
         return IVF_FLAT_build_config().configspace
     if index_type == "IVF_PQ" or index_type == IndexType.IVF_PQ:
@@ -136,8 +136,6 @@ def get_build_configspace(index_type):
     if index_type == "HNSW" or index_type == IndexType.HNSW:
         return HNSW_build_config().configspace
 
-# 
-
     
 
 class ENV():
@@ -145,18 +143,44 @@ class ENV():
         print("ENV")
         host = '127.0.0.1'
         port = '19530'
+
         self.client = Milvus(host, port)
-        self.collection_name = 'siftsmall'
+        self.collection_name = args.collection_name
         self.query_groundtruth = self.get_groundtruth()
         self.query_vectors = self.get_query()
         self.top_k = 100
 
         # get status by curretn db 
+        self.index_type = None
+        self.index_params = None
         self.refresh_status()
+
+        if args.op == "build_params":
+            self.target_index_type = get_index_type(args.index_type)
+            self.target_index_params = get_default_build_config(self.target_index_type)
+
+            is_build = False
+            if self.index_type != self.target_index_type:
+                is_build = True
+            elif self.index_params != self.target_index_params:
+                is_build = True
+            
+            if is_build:
+                self.env_build_input(self.target_index_type ,self.target_index_params)
+                self.refresh_status()
+            #  self.index_type = self.target_index_type
+            # self.index_params = self.target_index_params
+            # print(self.index_type)
+            # print(self.index_params)
+        
+
+
+        # self.target_index_params = args.index_params
 
         self.default_build_config = get_default_build_config(self.index_type)
         self.search_configspace = get_search_configspace(self.index_type)
         self.build_configspace = get_build_configspace(self.index_type)
+        # print(self.build_configspace)
         # print(self.default_build_config)
 
     def get_build_configspace(self):
@@ -167,12 +191,14 @@ class ENV():
         build_info = self.client.create_index(self.collection_name, self.index_type, self.default_build_config)
 
     def get_groundtruth(self):
-        groundtruth = np.load("./cached_datasets/siftsmall_numpy/siftsmall_groundtruth.npy") #! NEED modified to name-based
+        groundtruth = np.load("./cached_datasets/"+self.collection_name+"_numpy/"+self.collection_name+"_groundtruth.npy") 
+        # print(groundtruth)
         return groundtruth
 
     def get_query(self):
-        siftsmall_query = np.load("./cached_datasets/siftsmall_numpy/siftsmall_query.npy")
-        query_vectors = siftsmall_query
+        query_vectors = np.load("./cached_datasets/"+self.collection_name+"_numpy/"+self.collection_name+"_query.npy")
+        # print(query_vectors)
+        # query_vectors = siftsmall_query
         return query_vectors
 
     def get_avg_recall(self, preds, targets):
