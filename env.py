@@ -21,8 +21,10 @@ class IVF_FLAT_build_config(object):
 
     # nprobe = 16
 class IVF_FLAT_search_config(object):
-    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 1, 2048) #UPDATE BASED ON 0.1*BUILD IF "build"
-    configspace = cs.ConfigurationSpace([nprobe], seed=123)
+    # TODO: UPDATE BASED ON 0.1*BUILD IF "build"
+    def __init__(self, index_params):
+        self.nprobe =  cs.IntegerUniformHyperparameter('nprobe', 1, int(0.1 * index_params['nlist']))
+        self.configspace = cs.ConfigurationSpace([self.nprobe], seed=123)
     
 
 class IVF_PQ_default_build_config(object):
@@ -31,14 +33,17 @@ class IVF_PQ_default_build_config(object):
         self.m = 16 
 
 class IVF_PQ_build_config(object):
-    nlist =  cs.IntegerUniformHyperparameter('nlist', 0, 16384)
+    nlist =  cs.IntegerUniformHyperparameter('nlist', 1, 16384)
     # M =  cs.IntegerUniformHyperparameter('M', 1, 16) #(1, ?) NEED TO DIVIDE DATA DIM!!!
     m = cs.CategoricalHyperparameter('m', [i for i in range(1,16) if gDataDim%i == 0]) # TODO: remember to modify gDataDim
     configspace = cs.ConfigurationSpace([nlist, m], seed=123)
 
 class IVF_PQ_search_config(object):
-    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 1, 20)
-    configspace = cs.ConfigurationSpace([nprobe], seed=123)
+    def __init__(self, index_params):
+        self.nprobe =  cs.IntegerUniformHyperparameter('nprobe', 1, int(1 * index_params['nlist']))
+        self.configspace = cs.ConfigurationSpace([self.nprobe], seed=123)
+    # nprobe =  cs.IntegerUniformHyperparameter('nprobe', 1, int(16384 * 0.1))
+    # configspace = cs.ConfigurationSpace([nprobe], seed=123)
 
 class HNSW_default_build_config(object):
     def __init__(self):
@@ -68,8 +73,9 @@ class IVF_SQ8_build_config(object):
     configspace = cs.ConfigurationSpace([nlist], seed=123)
 
 class IVF_SQ8_search_config(object):
-    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 0, 2048)
-    configspace = cs.ConfigurationSpace([nprobe], seed=123)
+    def __init__(self, index_params):
+        self.nprobe =  cs.IntegerUniformHyperparameter('nprobe', 1, int(0.1 * index_params['nlist']))
+        self.configspace = cs.ConfigurationSpace([self.nprobe], seed=123)
     
 
 # TODO: can op to dict
@@ -105,13 +111,13 @@ def get_default_build_config(index_type):
     if index_type == IndexType.HNSW:
         return HNSW_default_build_config().__dict__
 
-def get_search_configspace(index_type):
+def get_search_configspace(index_type, index_params):
     if index_type == IndexType.IVF_FLAT:
-        return IVF_FLAT_search_config().configspace
+        return IVF_FLAT_search_config(index_params).configspace
     if index_type == IndexType.IVF_PQ:
-        return IVF_PQ_search_config().configspace
+        return IVF_PQ_search_config(index_params).configspace
     if index_type == IndexType.IVF_SQ8:
-        return IVF_SQ8_search_config().configspace
+        return IVF_SQ8_search_config(index_params).configspace
     if index_type == IndexType.HNSW:
         return HNSW_search_config().configspace
 
@@ -178,7 +184,7 @@ class ENV():
         # self.target_index_params = args.index_params
 
         self.default_build_config = get_default_build_config(self.index_type)
-        self.search_configspace = get_search_configspace(self.index_type)
+        self.search_configspace = get_search_configspace(self.index_type, self.index_params)
         self.build_configspace = get_build_configspace(self.index_type)
 
     # def get_build_configspace(self):
@@ -210,6 +216,7 @@ class ENV():
     def env_build_input(self, build_type, params):
         print(build_type, params)
         build_info = self.client.create_index(self.collection_name, build_type, params)
+        print(build_info)
         if build_info.code != 0:
             print("build_info failed!")
             print(build_info)
@@ -222,12 +229,13 @@ class ENV():
     def env_search_input(self, params):
         self.search_params = params
         start_time = time.time()
-        statue, res = self.client.search(self.collection_name, top_k = self.top_k, query_records = self.query_vectors, params = params)
+        status, res = self.client.search(self.collection_name, top_k = self.top_k, query_records = self.query_vectors, params = params)
 
         end_time = time.time()
-        if statue.code != 0:
+        print(status)
+        if status.code != 0:
             print("search failed!")
-            print(statue)
+            print(status)
         query_time = (end_time - start_time)
         query_num = self.query_vectors.shape[0]
         query_per_sec = query_num/query_time
@@ -250,11 +258,10 @@ class ENV():
         self.index_type = stats._index_type
         self.index_params = stats._params
 
-
         # set config space
         self.default_build_config = get_default_build_config(self.index_type)
-        self.search_configspace = get_search_configspace(self.index_type)
         self.build_configspace = get_build_configspace(self.index_type)
+        self.search_configspace = get_search_configspace(self.index_type, self.index_params)
 
 
     # given full env put
