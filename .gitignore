@@ -1,8 +1,0 @@
-bohb-hpo/
-**/__pycache__/
-**/.ipynb_checkpoints
-**/monitor/
-**/back/
-wandb/
-cached_datasets/
-
