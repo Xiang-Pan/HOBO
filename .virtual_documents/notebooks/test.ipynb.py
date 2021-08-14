@@ -733,25 +733,231 @@ import numpy as np
 import pandas as pd
 
 
-df = pd.read_csv("./grid_search_results/HNSW.csv")
+def sign(x, threshold):
+    if x > threshold:
+        return x - threshold
+    else:
+        return 100000 * (threshold - x)
+
+
+def fun(series):
+#     print(series)
+    loss = sign(series['recall'], 95) - series['query_per_sec']
+    return loss
+
+
+file_name = "./grid_search_results/IVF_FLAT.csv"
+
+
+df = pd.read_csv(file_name)
+df["loss"] = df.apply(fun,axis=1)
+df.to_csv(file_name)
+index = df['loss'].idxmin()
+df.iloc[index,:]
+
+
+file_name = "./grid_search_results/IVF_SQ8.csv"
+
+
+df = pd.read_csv(file_name)
+df["loss"] = df.apply(fun,axis=1)
+df.to_csv(file_name)
+index = df['loss'].idxmin()
+df.iloc[index,:]
+
+
+file_name = "./grid_search_results/HNSW.csv"
+
+
+df = pd.read_csv(file_name)
+df["loss"] = df.apply(fun,axis=1)
+df.to_csv(file_name)
+index = df['loss'].idxmin()
+df.iloc[index,:]
+
+
+file_name = "./grid_search_results/IVF_PQ.csv"
+
+
+df = pd.read_csv(file_name)
+df["loss"] = df.apply(fun,axis=1)
+df.to_csv(file_name)
+index = df['loss'].idxmin()
+df.iloc[index,:]
+
+
+cd ..
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+index_type = "IVF_FLAT"
+
+
+file_name = "./grid_search_results/"+index_type+".csv"
+
+
+df = pd.read_csv(file_name)
+
+
+df.to_csv(file_name,index = False)
 
 
 df
 
 
-index = df['loss'].idxmin()
+for i in range(101,16301,1000):
+    print(i)
+    sub = df[df["nlist"] == i]
+    print(sub)
+    x = sub["nprobe"]
+    y = sub["loss"]
+    plt.xlabel('nprobe')
+    plt.ylabel('loss')
+    title = index_type+', nlist = '+ str(i)
+    plt.title(title)
+    plt.ylim(-25000, 20000)
+    plt.plot(x,y)
+    plt.savefig("./figures/"+title)
+    
+    plt.show()
 
 
-df.iloc[index,:]
+
+import pandas as pd
+import matplotlib.pyplot as plt
 
 
-class IVF_PQ_default_build_config(object):
-    def __init__(self):
-        self.nlist  = 2048
-        self.M = 16 
+index_type = "IVF_SQ8"
 
 
-IVF_PQ_default_build_config().__dict__
+file_name = "./grid_search_results/"+index_type+".csv"
+
+
+df = pd.read_csv(file_name)
+
+
+df
+
+
+for i in range(101,16301,1000):
+    print(i)
+    sub = df[df["nlist"] == i]
+    print(sub)
+    x = sub["nprobe"]
+    y = sub["loss"]
+    plt.xlabel('nprobe')
+    plt.ylabel('loss')
+    title = index_type+', nlist = '+ str(i)
+    plt.title(title)
+    
+    
+    plt.ylim(-25000, 0)
+    plt.plot(x,y)
+    plt.savefig("./figures/"+title)
+    
+    plt.show()
+    
+    
+    
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+index_type = "IVF_PQ"
+
+
+file_name = "./grid_search_results/"+index_type+".csv"
+
+
+df = pd.read_csv(file_name)
+
+
+df = df.drop(columns = ["Unnamed: 0"])
+
+
+df
+
+
+for i in range(101,16301,1000):
+    print(i)
+    sub = df[df["nlist"] == i]
+    print(sub)
+    m_set = sorted(list(set(sub['M'])))
+    for m in m_set:
+#         print(m_set)
+        sub_sub = sub[sub["M"] == m].sort_values('nprobe')
+#         print(sub_sub)
+
+        x = sub_sub["nprobe"]
+        y = sub_sub["loss"]
+        plt.xlabel('nprobe')
+        plt.ylabel('loss')
+        title = index_type+', nlist = '+ str(i) + ", m = "+str(m)
+        plt.title(title)
+
+
+        plt.ylim(-25000, 0)
+        plt.plot(x,y)
+        plt.savefig("./figures/"+title)
+        plt.show()
+    
+    
+    
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+index_type = "HNSW"
+
+
+file_name = "./grid_search_results/"+index_type+".csv"
+
+
+df = pd.read_csv(file_name)
+
+
+df = df.drop(columns = ["Unnamed: 0"])
+
+
+df
+
+
+
+
+
+m_set = sorted(list(set(df['M'])))
+
+for m in m_set:
+    sub = df[df["M"] == m]
+    efConstruction_set = sorted(list(set(sub['efConstruction'])))
+    for efConstruction in efConstruction_set:
+#         print(m_set)
+        sub_sub = sub[sub["efConstruction"] == efConstruction].sort_values('ef')
+#         print(sub_sub)
+
+        x = sub_sub["ef"]
+        y = sub_sub["loss"]
+        plt.xlabel('ef')
+        plt.ylabel('loss')
+        title = index_type+', m = '+ str(m) + ", efConstruction = "+str(efConstruction)
+        plt.title(title)
+
+
+        plt.ylim(-25000, 0)
+        
+        plt.plot(x,y)
+        plt.savefig("./figures/"+title)
+        plt.show()
+    
+    
+    
 
 
 

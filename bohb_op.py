@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-08-13 18:16:21
+LastEditTime: 2021-08-13 19:16:52
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/bohb_op.py
@@ -24,7 +24,7 @@ table_dict = dict()
 min_loss = 9999999999999
 min_loss_recall = -1
 min_loss_query_per_sec = -1
-threshold = 90
+threshold = 95
 
 
 gCurIndexType = 0
@@ -36,22 +36,22 @@ gCurSearchParam = None
 def build_type_evaluate(params, n_iterations):
 
     env.target_index_type = params['index_type']
+    # env.check_index()
     env.refresh_status()
-    # env.set_build_index_type(params['index_type'])
 
-    opt = BOHB(env.get_build_configspace(), build_evaluate, max_budget = n_iterations, min_budget=1)
+    opt = BOHB(get_build_configspace(env.target_index_type), build_evaluate, max_budget = n_iterations, min_budget=1,eta = 10)
     logs = opt.optimize()
 
     return logs.best['loss']
 
 def build_evaluate(params, n_iterations):
     
-    env.env_build_input(params = params, build_type = env.target_index_type)
+    env.env_build_input(build_type = env.target_index_type, params = params)
 
     global gCurIndexParam
     gCurIndexParam = params
     
-    search_opt = BOHB(env.search_configspace, search_evaluate, max_budget=n_iterations, min_budget=1)
+    search_opt = BOHB(env.search_configspace, search_evaluate, max_budget=n_iterations, min_budget=1, eta = 10)
     logs = search_opt.optimize()
     return logs.best['loss']
 
@@ -59,7 +59,7 @@ def build_evaluate(params, n_iterations):
 def search_evaluate(params, n_iterations):
     recall, query_per_sec = env.env_search_input(params = params)
 
-    loss = sign(recall, threshold) + query_per_sec 
+    loss = sign(recall, threshold) - query_per_sec 
 
     if args.wandb_log:
         wandb.log({"recall": recall})
@@ -122,13 +122,14 @@ if __name__ == '__main__':
         type_opt = BOHB(index_type_configspace, build_type_evaluate, max_budget=10, min_budget=1)
         type_logs = type_opt.optimize()
         print(type_logs)
+        for ndx, row in table_dict['best'].iterrows():
+            print(row)
 
     elif args.op == "build_params":
         
         opt = BOHB(env.build_configspace, build_evaluate, max_budget=10, min_budget=1)
         logs = opt.optimize()
         # print(logs.best['hyperparameter'].to_dict())
-        print(table_dict['best'])
         for ndx, row in table_dict['best'].iterrows():
             print(row)
         # env.env_build_input(env.index_type, logs.best['hyperparameter'].to_dict())
@@ -143,7 +144,7 @@ if __name__ == '__main__':
         # TODO: fix this by decoupling target and current
         env.index_type = get_index_type(args.index_type) # from str to enum
         env.build_default_index()
-        opt = BOHB(env.search_configspace, search_evaluate, max_budget=10, min_budget=1)
+        opt = BOHB(env.search_configspace, search_evaluate, max_budget=5, min_budget=1)
         logs = opt.optimize()
         # print(logs)
         for ndx, row in table_dict['best'].iterrows():

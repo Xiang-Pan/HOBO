@@ -74,15 +74,14 @@ class BOHB:
         logs = Log(self.s_max+1)
         for s in reversed(range(self.s_max + 1)):
             logs[s] = {}
-            n = int(np.ceil(
-                (self.budget * (self.eta ** s)) / (self.max_budget * (s + 1))))
+            n = int(np.ceil((self.budget * (self.eta ** s)) / (self.max_budget * (s + 1))))
             r = self.max_budget * (self.eta ** -s)
             self.kde_good = None
             self.kde_bad = None
             self.samples = np.array([])
             for i in range(s+1):
                 n_i = n * self.eta ** (-i)  # Number of configs
-                r_i = r * self.eta ** (i)  # Budget
+                r_i = r * self.eta ** (i)   # Budget
                 logs[s][r_i] = {'loss': np.inf}
 
                 samples = []

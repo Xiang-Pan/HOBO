@@ -28,13 +28,13 @@ class IVF_FLAT_search_config(object):
 class IVF_PQ_default_build_config(object):
     def __init__(self):
         self.nlist  = 2048
-        self.M = 16 
+        self.m = 16 
 
 class IVF_PQ_build_config(object):
     nlist =  cs.IntegerUniformHyperparameter('nlist', 0, 16384)
     # M =  cs.IntegerUniformHyperparameter('M', 1, 16) #(1, ?) NEED TO DIVIDE DATA DIM!!!
-    M = cs.CategoricalHyperparameter('M', [i for i in range(1,16) if gDataDim%i == 0]) # TODO: remember to modify gDataDim
-    configspace = cs.ConfigurationSpace([nlist, M], seed=123)
+    m = cs.CategoricalHyperparameter('m', [i for i in range(1,16) if gDataDim%i == 0]) # TODO: remember to modify gDataDim
+    configspace = cs.ConfigurationSpace([nlist, m], seed=123)
 
 class IVF_PQ_search_config(object):
     nprobe =  cs.IntegerUniformHyperparameter('nprobe', 0, 20)
@@ -180,12 +180,10 @@ class ENV():
         self.default_build_config = get_default_build_config(self.index_type)
         self.search_configspace = get_search_configspace(self.index_type)
         self.build_configspace = get_build_configspace(self.index_type)
-        # print(self.build_configspace)
-        # print(self.default_build_config)
 
-    def get_build_configspace(self):
-        self.build_configspace = get_build_configspace(self.index_type)
-        return self.build_configspace
+    # def get_build_configspace(self):
+        # self.build_configspace = get_build_configspace(self.index_type)
+        # return self.build_configspace
         
     def build_default_index(self):
         build_info = self.client.create_index(self.collection_name, self.index_type, self.default_build_config)
@@ -210,7 +208,9 @@ class ENV():
         return avg_recall
     
     def env_build_input(self, build_type, params):
+        print(build_type, params)
         build_info = self.client.create_index(self.collection_name, build_type, params)
+        print(build_info)
         self.refresh_status()
     
     def set_build_index_type(self, index_type):
