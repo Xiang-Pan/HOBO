@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-08-13 19:16:52
+LastEditTime: 2021-08-14 13:26:23
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/bohb_op.py
@@ -39,7 +39,7 @@ def build_type_evaluate(params, n_iterations):
     # env.check_index()
     env.refresh_status()
 
-    opt = BOHB(get_build_configspace(env.target_index_type), build_evaluate, max_budget = n_iterations, min_budget=1,eta = 10)
+    opt = BOHB(get_build_configspace(env.target_index_type), build_evaluate, max_budget = n_iterations, min_budget=1,  eta = 10)
     logs = opt.optimize()
 
     return logs.best['loss']

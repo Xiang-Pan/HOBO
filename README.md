@@ -1,7 +1,7 @@
 <!--
  * @Author: Xiang Pan
  * @Date: 2021-07-10 00:23:34
- * @LastEditTime: 2021-08-13 20:22:57
+ * @LastEditTime: 2021-08-13 21:05:04
  * @LastEditors: Xiang Pan
  * @Description: 
  * @FilePath: /HOBO/README.md
@@ -58,5 +58,3 @@ TODO :How to implement an auto grid search tool
 
 # Benchmark
 ![image](https://raw.githubusercontent.com/matsui528/annbench_leaderboard/main/result_img/2021_02_23/deep1m.png)
-
-

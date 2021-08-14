@@ -80,6 +80,7 @@ class BOHB:
             self.kde_bad = None
             self.samples = np.array([])
             for i in range(s+1):
+                
                 n_i = n * self.eta ** (-i)  # Number of configs
                 r_i = r * self.eta ** (i)   # Budget
                 logs[s][r_i] = {'loss': np.inf}
@@ -87,6 +88,7 @@ class BOHB:
                 samples = []
                 losses = []
                 for j in range(n):
+                    print(self.s_max + 1,s,i,"/",s+1, j, n)
                     sample = self.get_sample()
                     if self.n_proc > 1:
                         loss = dask.delayed(self.evaluate)(sample.to_dict(), int(r_i))

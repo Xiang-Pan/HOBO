@@ -16,12 +16,12 @@ class IVF_FLAT_default_build_config(object):
         self.nlist = 2048
 
 class IVF_FLAT_build_config(object):
-    nlist =  cs.IntegerUniformHyperparameter('nlist', 0, 16384)
+    nlist =  cs.IntegerUniformHyperparameter('nlist', 1, 16384)
     configspace = cs.ConfigurationSpace([nlist], seed=123)
 
     # nprobe = 16
 class IVF_FLAT_search_config(object):
-    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 0, 2048) #UPDATE BASED ON 0.1*BUILD IF "build"
+    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 1, 2048) #UPDATE BASED ON 0.1*BUILD IF "build"
     configspace = cs.ConfigurationSpace([nprobe], seed=123)
     
 
@@ -37,7 +37,7 @@ class IVF_PQ_build_config(object):
     configspace = cs.ConfigurationSpace([nlist, m], seed=123)
 
 class IVF_PQ_search_config(object):
-    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 0, 20)
+    nprobe =  cs.IntegerUniformHyperparameter('nprobe', 1, 20)
     configspace = cs.ConfigurationSpace([nprobe], seed=123)
 
 class HNSW_default_build_config(object):
@@ -210,7 +210,9 @@ class ENV():
     def env_build_input(self, build_type, params):
         print(build_type, params)
         build_info = self.client.create_index(self.collection_name, build_type, params)
-        print(build_info)
+        if build_info.code != 0:
+            print("build_info failed!")
+            print(build_info)
         self.refresh_status()
     
     def set_build_index_type(self, index_type):
@@ -221,11 +223,14 @@ class ENV():
         self.search_params = params
         start_time = time.time()
         statue, res = self.client.search(self.collection_name, top_k = self.top_k, query_records = self.query_vectors, params = params)
+
         end_time = time.time()
+        if statue.code != 0:
+            print("search failed!")
+            print(statue)
         query_time = (end_time - start_time)
         query_num = self.query_vectors.shape[0]
         query_per_sec = query_num/query_time
-        # print(statue)
         if len(res) == 0:
             return 0, query_per_sec
         else:
@@ -244,6 +249,12 @@ class ENV():
         status, stats = self.client.get_index_info(self.collection_name)
         self.index_type = stats._index_type
         self.index_params = stats._params
+
+
+        # set config space
+        self.default_build_config = get_default_build_config(self.index_type)
+        self.search_configspace = get_search_configspace(self.index_type)
+        self.build_configspace = get_build_configspace(self.index_type)
 
 
     # given full env put
