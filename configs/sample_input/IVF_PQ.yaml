@@ -1,0 +1,8 @@
+index_type:
+  values: ["IVF_PQ"]
+parameters:
+  index_params:
+    nlist: 301
+    m: 8
+  search_params:
+    nprobe: 30

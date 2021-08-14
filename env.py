@@ -254,6 +254,11 @@ class ENV():
 
 
     def refresh_status(self):
+        """
+        refresh status
+        reset index_type and index_params
+        reset all config space 
+        """        
         status, stats = self.client.get_index_info(self.collection_name)
         self.index_type = stats._index_type
         self.index_params = stats._params
@@ -267,6 +272,7 @@ class ENV():
     # given full env put
     def config_input(self, config):
         # check current index type
+        print(config)
         is_build = False
 
         self.refresh_status()
@@ -279,8 +285,9 @@ class ENV():
         if is_build:
             self.env_build_input(config['index_type'] ,config['index_params'])
             self.refresh_status()
-            self.index_params = config['index_params']
         
+        input()
+
         # begin search 
         recall, query_per_sec = self.env_search_input(config['search_params'])
         self.search_params = config['search_params']

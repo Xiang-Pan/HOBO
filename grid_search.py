@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-04 03:58:20
+LastEditTime: 2021-08-14 19:10:24
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search.py
@@ -88,9 +88,11 @@ def dfs(a, l, depth):
 
 if __name__ == "__main__":
     run = wandb.init()
+    args = get_option()
+    
     wandb.run.name = args.grid_search_config
-
-    env = ENV()
+    
+    env = ENV(args)
     dfs(params_list,[],0)
 
     run.log({str(config['index_type']):table})

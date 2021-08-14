@@ -5,7 +5,7 @@ metric:
   goal: minimize
   name: loss
 index_type:
-  values: ["IVF_FLAT"]
+  values: ["HNSW"]
 parameters:
   build_M:
       values: range(4,64,10)
