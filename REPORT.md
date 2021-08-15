@@ -1,14 +1,14 @@
 <!--
  * @Author: Xiang Pan
  * @Date: 2021-08-13 18:00:59
- * @LastEditTime: 2021-08-14 22:12:01
+ * @LastEditTime: 2021-08-14 22:14:32
  * @LastEditors: Xiang Pan
  * @Description: 
  * @FilePath: /HOBO/REPORT.md
  * xiangpan@nyu.edu
 -->
 
-**Threshold 95**
+
 # Introduction
 For solving the optimization of milvus hyperparameters, we use the Bayesian Optimization and Hyperband(BOHB)[<sup>1</sup>](#refer-anchor-1) as our parameter search method.
 
@@ -27,7 +27,7 @@ recall - threshold & recall>threshold \\
 100000 * (threshold - x) & recall<=threshold,
 \end{cases}$$
 
-100000 is just a large number for Lagrange method.
+100000 is just a large number for Lagrange method, **threshold is set to 95**.
 
 ## Method 
 ![Model Architecture](./figures/flow.png)
@@ -86,7 +86,7 @@ RAM: 2182MiB / 32083MiB
 # TODO:
 - Add time Measure to current BO method and progress bar.
 - Try to solve the cold-start problem using the feature and best index choice prior.
-
+- We have noticed that m range for IVF_PQ is not suitable, we will increase m and get a result later.
 
 
 # References

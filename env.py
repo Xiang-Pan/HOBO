@@ -35,7 +35,7 @@ class IVF_PQ_default_build_config(object):
 class IVF_PQ_build_config(object):
     nlist =  cs.IntegerUniformHyperparameter('nlist', 1, 16384)
     # M =  cs.IntegerUniformHyperparameter('M', 1, 16) #(1, ?) NEED TO DIVIDE DATA DIM!!!
-    m = cs.CategoricalHyperparameter('m', [i for i in range(1,16) if gDataDim%i == 0]) # TODO: remember to modify gDataDim
+    m = cs.CategoricalHyperparameter('m', [i for i in range(1,32) if gDataDim%i == 0]) # TODO: remember to modify gDataDim
     configspace = cs.ConfigurationSpace([nlist, m], seed=123)
 
 class IVF_PQ_search_config(object):
