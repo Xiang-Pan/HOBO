@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-14 20:13:40
+LastEditTime: 2021-08-14 20:13:57
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_IVF_PQ.py
@@ -53,7 +53,7 @@ if __name__ == "__main__":
             for nprobe in [1, int(0.1*nlist), 100]:
                 config['index_params']['nlist'] = nlist
                 # config['index_params']['M'] = M
-                # config['index_params']['m'] = m
+                config['index_params']['m'] = m
                 config['search_params']['nprobe'] = nprobe
                 
                 recall , query_per_sec = env.config_input(config)
