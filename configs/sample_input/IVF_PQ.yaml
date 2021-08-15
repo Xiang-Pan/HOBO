@@ -3,6 +3,6 @@ index_type:
 parameters:
   index_params:
     nlist: 301
-    m: 8
+    m: 256
   search_params:
-    nprobe: 30
+    nprobe: 301

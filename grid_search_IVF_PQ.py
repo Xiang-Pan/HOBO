@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-14 22:17:17
+LastEditTime: 2021-08-14 22:20:16
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_IVF_PQ.py
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     table = wandb.Table(columns = cols)     
 
     for nlist in range(1,16384,100):
-        for m in [i for i in range(1,32) if gDataDim%i == 0]:
+        for m in [i for i in range(1,256) if gDataDim%i == 0]:
             for nprobe in [1, max(1,int(0.1*nlist)), 100]:
                 config['index_params']['nlist'] = nlist
                 # config['index_params']['M'] = M
