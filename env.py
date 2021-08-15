@@ -214,9 +214,9 @@ class ENV():
         return avg_recall
     
     def env_build_input(self, build_type, params):
-        print(build_type, params)
+        # print(build_type, params)
         build_info = self.client.create_index(self.collection_name, build_type, params)
-        print(build_info)
+        # print(build_info)
         if build_info.code != 0:
             print("build_info failed!")
             print(build_info)
@@ -232,7 +232,7 @@ class ENV():
         status, res = self.client.search(self.collection_name, top_k = self.top_k, query_records = self.query_vectors, params = params)
 
         end_time = time.time()
-        print(status)
+        # print(status)
         if status.code != 0:
             print("search failed!")
             print(status)

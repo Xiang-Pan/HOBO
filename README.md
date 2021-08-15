@@ -1,7 +1,7 @@
 <!--
  * @Author: Xiang Pan
  * @Date: 2021-07-10 00:23:34
- * @LastEditTime: 2021-08-14 20:10:09
+ * @LastEditTime: 2021-08-14 20:40:50
  * @LastEditors: Xiang Pan
  * @Description: 
  * @FilePath: /HOBO/README.md
@@ -49,11 +49,7 @@ metric:
 HNSW     https://wandb.ai/xiang-pan/HOBO/runs/3vdvm6gs  
 IVF_SQ8  https://wandb.ai/xiang-pan/HOBO/runs/26z6cea5  (run locally, need rerun)  
 IVF_FLAT https://wandb.ai/xiang-pan/HOBO/runs/22n2lk07  
-IVF_PQ  https://wandb.ai/xiang-pan/HOBO/runs/22mj5iiv  
-
-# TODO
-TODO :How to implement an auto grid search tool
-
+IVF_PQ  https://wandb.ai/xiang-pan/HOBO/runs/wou99tvr  
 
 # Benchmark
 ![image](https://raw.githubusercontent.com/matsui528/annbench_leaderboard/main/result_img/2021_02_23/deep1m.png)

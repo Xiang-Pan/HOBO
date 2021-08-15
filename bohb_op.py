@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-08-14 20:18:12
+LastEditTime: 2021-08-14 21:27:01
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/bohb_op.py
@@ -51,6 +51,7 @@ def build_evaluate(params, n_iterations):
     global gCurIndexParam
     gCurIndexParam = params
     
+    # the search configuration already refreshed
     search_opt = BOHB(env.search_configspace, search_evaluate, max_budget=n_iterations, min_budget=1)
     logs = search_opt.optimize()
     return logs.best['loss']
@@ -118,24 +119,29 @@ if __name__ == '__main__':
         wandb.run.name = name
     if args.op == "build_type":
         build_type_search_spcae = [IndexType.IVF_FLAT, IndexType.IVF_PQ, IndexType.IVF_SQ8, IndexType.HNSW]
-        build_type_search_method = "NOT BO"
-        if build_type_search_method == "BO":
-            index_type = cs.CategoricalHyperparameter('index_type',[IndexType.IVF_FLAT, IndexType.IVF_PQ, IndexType.IVF_SQ8, IndexType.HNSW])
+        # build_type_op_method = args.build_type_op_method
+        if args.build_type_op_method == "BO":
+            index_type = cs.CategoricalHyperparameter('index_type', build_type_search_spcae)
             index_type_configspace = cs.ConfigurationSpace([index_type], seed=123)
             type_opt = BOHB(index_type_configspace, build_type_evaluate, max_budget=10, min_budget=1)
             type_logs = type_opt.optimize()
             print(type_logs)
         else:
-            print("a")
-        
+            for index_type in build_type_search_spcae:
+
+                env.target_index_type = index_type
+                env.refresh_status()
+                
+                opt = BOHB(get_build_configspace(env.target_index_type), build_evaluate, max_budget=10, min_budget=1)
+                logs = opt.optimize()
+
         for ndx, row in table_dict['best'].iterrows():
             print(row)
 
     elif args.op == "build_params":
         
-        opt = BOHB(env.build_configspace, build_evaluate, max_budget=10, min_budget=1)
+        opt = BOHB(get_build_configspace(env.target_index_type), build_evaluate, max_budget=10, min_budget=1)
         logs = opt.optimize()
-        # print(logs.best['hyperparameter'].to_dict())
         for ndx, row in table_dict['best'].iterrows():
             print(row)
         # env.env_build_input(env.index_type, logs.best['hyperparameter'].to_dict())
