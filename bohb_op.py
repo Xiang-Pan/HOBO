@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-08-14 13:26:23
+LastEditTime: 2021-08-14 20:11:42
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/bohb_op.py
@@ -51,7 +51,7 @@ def build_evaluate(params, n_iterations):
     global gCurIndexParam
     gCurIndexParam = params
     
-    search_opt = BOHB(env.search_configspace, search_evaluate, max_budget=n_iterations, min_budget=1, eta = 10)
+    search_opt = BOHB(env.search_configspace, search_evaluate, max_budget=n_iterations, min_budget=1)
     logs = search_opt.optimize()
     return logs.best['loss']
 
@@ -59,7 +59,7 @@ def build_evaluate(params, n_iterations):
 def search_evaluate(params, n_iterations):
     recall, query_per_sec = env.env_search_input(params = params)
 
-    loss = sign(recall, threshold) - query_per_sec 
+    loss = sign(recall, threshold) - query_per_sec
 
     if args.wandb_log:
         wandb.log({"recall": recall})
@@ -117,11 +117,16 @@ if __name__ == '__main__':
         run = wandb.init()
         wandb.run.name = name
     if args.op == "build_type":
-        index_type = cs.CategoricalHyperparameter('index_type',[IndexType.IVF_FLAT, IndexType.IVF_PQ, IndexType.IVF_SQ8, IndexType.HNSW])
-        index_type_configspace = cs.ConfigurationSpace([index_type], seed=123)
-        type_opt = BOHB(index_type_configspace, build_type_evaluate, max_budget=10, min_budget=1)
-        type_logs = type_opt.optimize()
-        print(type_logs)
+        build_type_search_spcae = [IndexType.IVF_FLAT, IndexType.IVF_PQ, IndexType.IVF_SQ8, IndexType.HNSW]
+        build_type_search_method = "NOT BO"
+        if build_type_search_method == "BO":
+            index_type = cs.CategoricalHyperparameter('index_type',[IndexType.IVF_FLAT, IndexType.IVF_PQ, IndexType.IVF_SQ8, IndexType.HNSW])
+            index_type_configspace = cs.ConfigurationSpace([index_type], seed=123)
+            type_opt = BOHB(index_type_configspace, build_type_evaluate, max_budget=10, min_budget=1)
+            type_logs = type_opt.optimize()
+            print(type_logs)
+        else:
+        
         for ndx, row in table_dict['best'].iterrows():
             print(row)
 
