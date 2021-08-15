@@ -286,7 +286,7 @@ class ENV():
             self.env_build_input(config['index_type'] ,config['index_params'])
             self.refresh_status()
         
-        input()
+        # input()
 
         # begin search 
         recall, query_per_sec = self.env_search_input(config['search_params'])

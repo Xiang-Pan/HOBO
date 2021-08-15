@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-14 20:13:57
+LastEditTime: 2021-08-14 20:24:06
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_IVF_PQ.py
@@ -31,7 +31,7 @@ if __name__ == "__main__":
 
     args.index_type = 'IVF_PQ'
     args.build_nlist = -1
-    args.build_M = -1
+    args.build_m = -1
     args.search_nprobe = -1
 
     run = wandb.init()
@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     config = convert_config(args)
     run = wandb.init()
-    env = ENV()
+    env = ENV(args)
     
 
     target_index_params = config['index_params']
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     table = wandb.Table(columns = cols)     
 
     for nlist in range(1,16384,100):
-        for M in [i for i in range(1,16) if gDataDim%i == 0]:
+        for m in [i for i in range(1,16) if gDataDim%i == 0]:
             for nprobe in [1, int(0.1*nlist), 100]:
                 config['index_params']['nlist'] = nlist
                 # config['index_params']['M'] = M

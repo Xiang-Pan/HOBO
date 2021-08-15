@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-08-14 20:11:42
+LastEditTime: 2021-08-14 20:18:12
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/bohb_op.py
@@ -126,6 +126,7 @@ if __name__ == '__main__':
             type_logs = type_opt.optimize()
             print(type_logs)
         else:
+            print("a")
         
         for ndx, row in table_dict['best'].iterrows():
             print(row)
