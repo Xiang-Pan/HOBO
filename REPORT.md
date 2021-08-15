@@ -1,13 +1,20 @@
 <!--
  * @Author: Xiang Pan
  * @Date: 2021-08-13 18:00:59
- * @LastEditTime: 2021-08-14 22:14:32
+ * @LastEditTime: 2021-08-15 00:38:03
  * @LastEditors: Xiang Pan
  * @Description: 
  * @FilePath: /HOBO/REPORT.md
  * xiangpan@nyu.edu
 -->
 
+# Project Information
+
+Project ID: 210310187
+
+Project Name: Auto tuner for vector indexing parameters
+
+Time Planning: Basic BOHB optimization in mid term.
 
 # Introduction
 For solving the optimization of milvus hyperparameters, we use the Bayesian Optimization and Hyperband(BOHB)[<sup>1</sup>](#refer-anchor-1) as our parameter search method.
@@ -42,10 +49,10 @@ RAM: 2182MiB / 32083MiB
 
 ## 
 
-| Method                | index_type | M  | efConstruction | ef  | recall | query_per_sec | loss     |
-|-----------------------|------------|----|----------------|-----|--------|---------------|----------|
-| [BOHB(Index Type Loop)](https://wandb.ai/xiang-pan/HOBO/runs/14pnimgi) | 'HNSW'     | 4  | 389            | 167 | 96.13  | 18132.8       | -18131.7 |
-| [BOHB(Index Type BO)](https://wandb.ai/xiang-pan/HOBO/runs/1716bulq)   | 'HNSW'     | 17 | 101            | 176 | 99.91  | 17334.7       | -17329.8 |
+| Method                                                                 | index_type | M  | efConstruction | ef  | recall | query_per_sec | loss     |
+|------------------------------------------------------------------------|------------|----|----------------|-----|--------|---------------|----------|
+| [BOHB(Index Type Loop)](https://wandb.ai/xiang-pan/HOBO/runs/14pnimgi) | 'HNSW'     | 17 | 445            | 114 | 99.68  | 16782.6       | -16777.9 |
+| [BOHB(Index Type BO)](https://wandb.ai/xiang-pan/HOBO/runs/13jdknsy)   | 'HNSW'     | 22 | 274            | 106 | 99.75  | 18522         | -18517.2 |
 
 |                                                              | index_type | nlist | M   | nprobe | recall | query_per_sec | loss          |
 |--------------------------------------------------------------|------------|-------|-----|--------|--------|---------------|---------------|
@@ -70,10 +77,10 @@ RAM: 2182MiB / 32083MiB
 | [Grid Search](https://wandb.ai/xiang-pan/HOBO/runs/26z6cea5) | 'IVF_SQ8'  | 5401  | 101    | 99.49  | 13080.62997   | -13076.13997 |
 
 ## IVF_PQ
-|                                                              | index_type | m | nlist | nprobe | recall | query_per_sec | loss           |
-|--------------------------------------------------------------|------------|---|-------|--------|--------|---------------|----------------|
-| [BOHB](https://wandb.ai/xiang-pan/HOBO/runs/2hh95hjr)        | 'IVF_PQ'   | 8 | 3800  | 205    | 70.69  | 10549.1       | 2.42045e+06    |
-| [Grid Search](https://wandb.ai/xiang-pan/HOBO/runs/2i7nos9y) | 'IVF_PQ'   | 8 | 8001  | 800    | 70.69  | 1733.677784   | 2432733.677784 |
+|                                                              | index_type | m   | nlist | nprobe | recall | query_per_sec      | loss                |
+|--------------------------------------------------------------|------------|-----|-------|--------|--------|--------------------|---------------------|
+| [BOHB](https://wandb.ai/xiang-pan/HOBO/runs/2hh95hjr)        | 'IVF_PQ'   | 128 | 3800  | 205    | 98.1   | 1289.0043055892756 | -1285.9043055892757 |
+| [Grid Search](https://wandb.ai/xiang-pan/HOBO/runs/2hh95hjr) (note: Loss is not correct in the wandb table) | 'IVF_ IVF_PQ'   | 64 | 1  | 1    | 95.08  | 1733.677784        | -7629.256438      |
 
 
 ## HNSW
@@ -86,7 +93,6 @@ RAM: 2182MiB / 32083MiB
 # TODO:
 - Add time Measure to current BO method and progress bar.
 - Try to solve the cold-start problem using the feature and best index choice prior.
-- We have noticed that m range for IVF_PQ is not suitable, we will increase m and get a result later.
 
 
 # References
