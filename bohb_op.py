@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-08-14 21:27:01
+LastEditTime: 2021-08-14 22:23:50
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/bohb_op.py
@@ -17,6 +17,7 @@ from milvus import Milvus, MetricType, IndexType
 import sys
 import pandas as pd
 from utils import *
+from generate_markdown import *
 
 args = get_option()
 table_dict = dict()
@@ -170,3 +171,5 @@ if __name__ == '__main__':
     # print(table_dict)
     for k,v in table_dict.items():
         run.log({str(k): v})
+    
+    print_markdown_table(wandb.run.id)
