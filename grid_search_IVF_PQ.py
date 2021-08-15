@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 21:18:11
-LastEditTime: 2021-08-14 20:27:33
+LastEditTime: 2021-08-14 21:35:16
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/grid_search_IVF_PQ.py
@@ -30,8 +30,8 @@ if __name__ == "__main__":
     args = get_option()
 
     args.index_type = 'IVF_PQ'
-    args.build_nlist = -1
     args.build_m = -1
+    args.build_nlist = -1
     args.search_nprobe = -1
 
     run = wandb.init()
