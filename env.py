@@ -6,7 +6,7 @@ import bohb.configspace as cs
 import json
 from milvus import Milvus, MetricType, IndexType
 
-gDataDim = 512
+gDataDim = 128
 
 
 
@@ -35,7 +35,7 @@ class IVF_PQ_default_build_config(object):
 class IVF_PQ_build_config(object):
     nlist =  cs.IntegerUniformHyperparameter('nlist', 1, 16384)
     # M =  cs.IntegerUniformHyperparameter('M', 1, 16) #(1, ?) NEED TO DIVIDE DATA DIM!!!
-    m = cs.CategoricalHyperparameter('m', [i for i in range(1,256) if gDataDim%i == 0]) # TODO: remember to modify gDataDim
+    m = cs.CategoricalHyperparameter('m', [i for i in range(1,gDataDim) if gDataDim%i == 0]) # TODO: remember to modify gDataDim
     configspace = cs.ConfigurationSpace([nlist, m], seed=123)
 
 class IVF_PQ_search_config(object):
@@ -161,6 +161,9 @@ class ENV():
         self.index_params = None
         self.refresh_status()
 
+        global gDataDim
+        gDataDim = 32
+
         if args.op == "build_params":
             self.target_index_type = get_index_type(args.index_type)
             self.target_index_params = get_default_build_config(self.target_index_type)
@@ -195,12 +198,12 @@ class ENV():
         build_info = self.client.create_index(self.collection_name, self.index_type, self.default_build_config)
 
     def get_groundtruth(self):
-        groundtruth = np.load("./cached_datasets/"+self.collection_name+"_numpy/"+self.collection_name+"_groundtruth.npy") 
+        groundtruth = np.load("./cached_datasets/"+self.collection_name+"/"+self.collection_name+"_groundtruth.npy") 
         # print(groundtruth)
         return groundtruth
 
     def get_query(self):
-        query_vectors = np.load("./cached_datasets/"+self.collection_name+"_numpy/"+self.collection_name+"_query.npy")
+        query_vectors = np.load("./cached_datasets/"+self.collection_name+"/"+self.collection_name+"_query.npy")
         # print(query_vectors)
         # query_vectors = siftsmall_query
         return query_vectors
