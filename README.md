@@ -1,7 +1,7 @@
 <!--
  * @Author: Xiang Pan
  * @Date: 2021-07-10 00:23:34
- * @LastEditTime: 2021-08-14 20:40:50
+ * @LastEditTime: 2021-08-19 17:14:54
  * @LastEditors: Xiang Pan
  * @Description: 
  * @FilePath: /HOBO/README.md
@@ -32,6 +32,7 @@ HNSW
 ## python run
 ```
 python bohb_op.py --op build_type --threshold 95 --wandb_log
+python bohb_op.py --op build_type --build_search_share_space --threshold 95 --wandb_log
 python bohb_op.py --index_type IVF_FLAT --op build_params --threshold 95 --wandb_log
 python bohb_op.py --index_type IVF_FLAT --op search_params --threshold 95 --wandb_log
 ```
