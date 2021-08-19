@@ -57,8 +57,7 @@ class HNSW_build_config(object):
     configspace = cs.ConfigurationSpace([M, efConstruction], seed=123)
 
 class HNSW_search_config(object):
-    top_k = 100 #trace it back!!
-    # nprobe =  cs.IntegerUniformHyperparameter('nprobe', 8, 512)# efsearch? ASK WEIZHI; (8, 512)
+    top_k = 100 
     ef =  cs.IntegerUniformHyperparameter('ef', top_k, 512)          # efsearch? ASK WEIZHI; (8, 512)
     configspace = cs.ConfigurationSpace([ef], seed=123)
 
@@ -66,7 +65,7 @@ class IVF_SQ8_default_build_config(object):
     def __init__(self):
         self.nlist = 2048
         # QuantizerType = 8
-        self.nprobe = 16
+        # self.nprobe = 16
 
 class IVF_SQ8_build_config(object):
     nlist =  cs.IntegerUniformHyperparameter('nlist', 1, 16384) #SAME AS FLAT
@@ -77,6 +76,34 @@ class IVF_SQ8_search_config(object):
         self.nprobe =  cs.IntegerUniformHyperparameter('nprobe', 1, int(0.1 * index_params['nlist']))
         self.configspace = cs.ConfigurationSpace([self.nprobe], seed=123)
     
+class IVF_FLAT_build_search_shared_config(object):
+    def __init__(self):
+        self.nlist =  cs.IntegerUniformHyperparameter('nlist', 1, 16384)
+        self.nprobe =  cs.IntegerUniformHyperparameter('nprobe', 1, 16384)
+        self.configspace = cs.ConfigurationSpace([self.nlist, self.nprobe], seed=123)
+
+
+class IVF_SQ8_build_search_shared_config(object):
+    def __init__(self):
+        self.nlist =  cs.IntegerUniformHyperparameter('nlist', 1, 16384)
+        self.nprobe =  cs.IntegerUniformHyperparameter('nprobe', 1, 16384)
+        self.configspace = cs.ConfigurationSpace([self.nlist, self.nprobe], seed=123)
+
+class IVF_PQ_build_search_shared_config(object):
+    def __init__(self):
+        self.nlist =  cs.IntegerUniformHyperparameter('nlist', 1, 16384)
+        self.m = cs.CategoricalHyperparameter('m', [i for i in range(1,gDataDim) if gDataDim%i == 0])
+        self.nprobe =  cs.IntegerUniformHyperparameter('nprobe', 1, 16384)
+        self.configspace = cs.ConfigurationSpace([self.nlist, self.m, self.nprobe, ], seed=123)
+
+class HNSW_build_search_shared_config(object):
+    def __init__(self):
+        self.M =  cs.IntegerUniformHyperparameter('M', 4, 64)
+        self.efConstruction =  cs.IntegerUniformHyperparameter('efConstruction', 8, 512)
+        top_k = 100 
+        self.ef =  cs.IntegerUniformHyperparameter('ef', top_k, 512)          # efsearch? ASK WEIZHI; (8, 512)
+        self.configspace = cs.ConfigurationSpace([self.M, self.efConstruction, self.ef], seed=123)
+
 
 # TODO: can op to dict
 def get_index_type(index_type):
@@ -142,7 +169,16 @@ def get_build_configspace(index_type):
     if index_type == "HNSW" or index_type == IndexType.HNSW:
         return HNSW_build_config().configspace
 
-    
+def get_build_search_shared_configspace(index_type):
+    if index_type == "IVF_FLAT" or index_type == IndexType.IVF_FLAT:
+        return IVF_FLAT_build_search_shared_config().configspace
+    if index_type == "IVF_PQ" or index_type == IndexType.IVF_PQ:
+        return IVF_PQ_build_search_shared_config().configspace
+    if index_type == "IVF_SQ8" or index_type == IndexType.IVF_SQ8:
+        return IVF_SQ8_build_search_shared_config().configspace
+    if index_type == "HNSW" or index_type == IndexType.HNSW:
+        return HNSW_build_search_shared_config().configspace
+
 
 class ENV():
     def __init__(self, args = None):
@@ -275,7 +311,7 @@ class ENV():
     # given full env put
     def config_input(self, config):
         # check current index type
-        print(config)
+        # print(config)
         is_build = False
 
         self.refresh_status()
@@ -289,9 +325,7 @@ class ENV():
             self.env_build_input(config['index_type'] ,config['index_params'])
             self.refresh_status()
         
-        # input()
 
-        # begin search 
         recall, query_per_sec = self.env_search_input(config['search_params'])
         self.search_params = config['search_params']
         

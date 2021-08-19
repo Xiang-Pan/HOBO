@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 17:05:12
-LastEditTime: 2021-08-14 20:25:19
+LastEditTime: 2021-08-19 16:51:32
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/utils.py
@@ -9,9 +9,12 @@ xiangpan@nyu.edu
 '''
 from env import *
 
-def sign(x, threshold):
+def sign(x, threshold, gap = 2):
     if x > threshold:
-        return x - threshold
+        if (x > threshold + gap):
+            return - 100000 * (x - threshold - gap)
+        else:  
+            return 0
     else:
         return 100000 * (threshold - x)
 

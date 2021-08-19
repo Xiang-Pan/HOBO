@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-08-14 22:23:50
+LastEditTime: 2021-08-19 17:13:15
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/bohb_op.py
@@ -39,11 +39,33 @@ def build_type_evaluate(params, n_iterations):
     env.target_index_type = params['index_type']
     # env.check_index()
     env.refresh_status()
-
-    opt = BOHB(get_build_configspace(env.target_index_type), build_evaluate, max_budget = n_iterations, min_budget=1,  eta = 10)
-    logs = opt.optimize()
+    if args.build_search_share_space:
+        opt = BOHB(get_build_search_shared_configspace(env.target_index_type), build_search_share_space_evaluate, max_budget = n_iterations, min_budget=1,  eta = 10)
+        logs = opt.optimize()
+    
+    else:
+        opt = BOHB(get_build_configspace(env.target_index_type), build_evaluate, max_budget = n_iterations, min_budget=1,  eta = 10)
+        logs = opt.optimize()
 
     return logs.best['loss']
+
+# def build_type_togethe
+def build_search_share_space_evaluate(params, n_iterations):
+    
+    # print(params)
+    if 'nlist' in params.keys() and 'nprobe' in params.keys():
+        if params['nlist'] <= params['nprobe']:
+            return np.inf
+    config = dict()
+    config['index_type'] = env.target_index_type
+    config['index_params'] = dict((key, value) for key, value in params.items() if key not in ['nprobe', 'ef'])
+    config['search_params'] = dict((key, value) for key, value in params.items() if key in ['nprobe', 'ef'])
+    recall , query_per_sec = env.config_input(config)
+    loss = loss_opertation(recall, query_per_sec)
+    
+    return loss
+
+
 
 def build_evaluate(params, n_iterations):
     
@@ -57,12 +79,8 @@ def build_evaluate(params, n_iterations):
     logs = search_opt.optimize()
     return logs.best['loss']
 
-
-def search_evaluate(params, n_iterations):
-    recall, query_per_sec = env.env_search_input(params = params)
-
+def loss_opertation(recall, query_per_sec):
     loss = sign(recall, threshold) - query_per_sec
-
     if args.wandb_log:
         wandb.log({"recall": recall})
         wandb.log({"query_per_sec": query_per_sec})
@@ -94,6 +112,13 @@ def search_evaluate(params, n_iterations):
             table_dict['best'] = wandb.Table(columns = cols)
             data = [str(env.index_type)] + data 
             table_dict['best'].add_data(*data)
+            wandb.log({"best_loss" :loss})
+    return loss
+
+def search_evaluate(params, n_iterations):
+    recall, query_per_sec = env.env_search_input(params = params)
+
+    loss = loss_opertation(recall, query_per_sec)
 
     return loss
 
@@ -118,6 +143,7 @@ if __name__ == '__main__':
         name = get_exp_name(args)
         run = wandb.init()
         wandb.run.name = name
+    # if args.op == "build_search_"
     if args.op == "build_type":
         build_type_search_spcae = [IndexType.IVF_FLAT, IndexType.IVF_PQ, IndexType.IVF_SQ8, IndexType.HNSW]
         # build_type_op_method = args.build_type_op_method
