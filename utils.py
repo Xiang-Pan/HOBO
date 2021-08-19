@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-29 17:05:12
-LastEditTime: 2021-08-19 16:51:32
+LastEditTime: 2021-08-19 17:16:55
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/utils.py
@@ -12,7 +12,7 @@ from env import *
 def sign(x, threshold, gap = 2):
     if x > threshold:
         if (x > threshold + gap):
-            return - 100000 * (x - threshold - gap)
+            return 100000 * (x - threshold - gap)
         else:  
             return 0
     else:
