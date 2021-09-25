@@ -88,7 +88,7 @@ class BOHB:
                 samples = []
                 losses = []
                 for j in range(n):
-                    print(self.s_max + 1,s,i,"/",s+1, j, n)
+                    # print(self.s_max + 1,s,i,"/",s+1, j, n)
                     sample = self.get_sample()
                     if self.n_proc > 1:
                         loss = dask.delayed(self.evaluate)(sample.to_dict(), int(r_i))

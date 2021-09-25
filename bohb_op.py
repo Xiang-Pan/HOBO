@@ -1,14 +1,13 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-08-19 18:55:44
+LastEditTime: 2021-09-25 18:51:58
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/bohb_op.py
 xiangpan@nyu.edu
 '''
 
-import wandb
 from bohb import BOHB
 import bohb.configspace as cs
 from option import *
@@ -27,12 +26,9 @@ min_loss_recall = -1
 min_loss_query_per_sec = -1
 threshold = 95
 
-
 gCurIndexType = 0
 gCurIndexParam = None
 gCurSearchParam = None
-
-
 
 def build_type_evaluate(params, n_iterations):
 
@@ -46,13 +42,10 @@ def build_type_evaluate(params, n_iterations):
     else:
         opt = BOHB(get_build_configspace(env.target_index_type), build_evaluate, max_budget = n_iterations, min_budget=1,  eta = 10)
         logs = opt.optimize()
-
     return logs.best['loss']
 
 # def build_type_togethe
 def build_search_share_space_evaluate(params, n_iterations):
-    
-    # print(params)
     if 'nlist' in params.keys() and 'nprobe' in params.keys():
         if params['nlist'] <= params['nprobe']:
             return np.inf
@@ -62,10 +55,7 @@ def build_search_share_space_evaluate(params, n_iterations):
     config['search_params'] = dict((key, value) for key, value in params.items() if key in ['nprobe', 'ef'])
     recall , query_per_sec = env.config_input(config)
     loss = loss_opertation(recall, query_per_sec)
-    
     return loss
-
-
 
 def build_evaluate(params, n_iterations):
     
@@ -80,16 +70,40 @@ def build_evaluate(params, n_iterations):
     return logs.best['loss']
 
 def loss_opertation(recall, query_per_sec):
+    
     loss = sign(recall, threshold) - query_per_sec
+    env.refresh_status()
+    
+    data = list(env.index_params.values()) + list(env.search_params.values()) + [recall, query_per_sec, loss]
+    
+    global table_dict
+
+    if env.index_type not in table_dict.keys():
+        cols = list(env.index_params.keys()) + list(env.search_params.keys()) + ["recall", "query_per_sec", "loss"] 
+        table = pd.DataFrame([data], columns=cols)
+        table_dict[env.index_type] = table
+    else:
+        table_dict[env.index_type].loc[len(table_dict[env.index_type].index)] = data
+    
+    if 'best' not in table_dict.keys():
+        cols = ["index_type"] + list(env.index_params.keys()) + list(env.search_params.keys()) + ["recall", "query_per_sec", "loss"] 
+        data = [str(env.index_type)] + data 
+        table_dict['best'] = pd.DataFrame([data], columns=cols)  
+        table_dict['best'].style.set_caption("best op")
+    elif loss < table_dict['best']["loss"][0]:
+        data = [str(env.index_type)] + data 
+        table_dict['best'].loc[0] = data
+        if args.wandb_log:
+            wandb.log({"best_loss" :loss})
+
     if args.wandb_log:
         wandb.log({"recall": recall})
         wandb.log({"query_per_sec": query_per_sec})
         wandb.log({"loss": loss})
 
         # index
-        env.refresh_status()
         wandb.log({"index_type_enum": int(env.index_type.value)})
- 
+
         # build
         for k,v in env.index_params.items():
             wandb.log({k: v}) 
@@ -97,32 +111,13 @@ def loss_opertation(recall, query_per_sec):
         # search
         for k,v in env.search_params.items():
             wandb.log({k: v})
-        
-        data = list(env.index_params.values()) + list(env.search_params.values()) + [recall, query_per_sec, loss]
-    
-        global table_dict
 
-        if env.index_type not in table_dict.keys():
-            print("create_index")
-            cols = list(env.index_params.keys()) + list(env.search_params.keys()) + ["recall", "query_per_sec", "loss"] 
-            table_dict[env.index_type] = wandb.Table(columns = cols)
-        table_dict[env.index_type].add_data(*data)
-        if 'best' not in table_dict.keys() or loss < table_dict['best'].get_column("loss")[0]:
-            cols = ["index_type"] + list(env.index_params.keys()) + list(env.search_params.keys()) + ["recall", "query_per_sec", "loss"] 
-            # data = list(env.index_params.values()) + list(env.search_params.values()) + [recall, query_per_sec, loss]
-            table_dict['best'] = wandb.Table(columns = cols)
-            data = [str(env.index_type)] + data 
-            table_dict['best'].add_data(*data)
-            wandb.log({"best_loss" :loss})
     return loss
 
 def search_evaluate(params, n_iterations):
     recall, query_per_sec = env.env_search_input(params = params)
-
     loss = loss_opertation(recall, query_per_sec)
-
     return loss
-
 
 def get_exp_name(args):
     if args.op == "build_type":
@@ -136,67 +131,45 @@ def get_exp_name(args):
         name = "error_run"
     return name
 
-
 if __name__ == '__main__':
     env = ENV(args)
     threshold = args.threshold
+    name = get_exp_name(args)
     if args.wandb_log:
-        name = get_exp_name(args)
+        import wandb
         run = wandb.init(entity="milvus")
         wandb.run.name = name
-    # if args.op == "build_search_"
     if args.op == "build_type":
         build_type_search_spcae = [IndexType.IVF_FLAT, IndexType.IVF_PQ, IndexType.IVF_SQ8, IndexType.HNSW]
-        # build_type_op_method = args.build_type_op_method
-        if args.build_type_op_method == "BO":
+        if args.build_type_op_method == "BO":  # BO
             index_type = cs.CategoricalHyperparameter('index_type', build_type_search_spcae)
             index_type_configspace = cs.ConfigurationSpace([index_type], seed=123)
             type_opt = BOHB(index_type_configspace, build_type_evaluate, max_budget=10, min_budget=1)
             type_logs = type_opt.optimize()
-            print(type_logs)
-        else:
+        else:                                 # Loop
             for index_type in build_type_search_spcae:
-
                 env.target_index_type = index_type
                 env.refresh_status()
-                
                 opt = BOHB(get_build_configspace(env.target_index_type), build_evaluate, max_budget=10, min_budget=1)
                 logs = opt.optimize()
 
-        for ndx, row in table_dict['best'].iterrows():
-            print(row)
-
     elif args.op == "build_params":
-        
         opt = BOHB(get_build_configspace(env.target_index_type), build_evaluate, max_budget=10, min_budget=1)
         logs = opt.optimize()
-        for ndx, row in table_dict['best'].iterrows():
-            print(row)
-        # env.env_build_input(env.index_type, logs.best['hyperparameter'].to_dict())
-        # search_opt = BOHB(env.search_configspace, search_evaluate, max_budget=10, min_budget=1)
-        # search_logs = search_opt.optimize()
-        # recall, query_per_sec = env.env_search_input(search_logs.best['hyperparameter'].to_dict())
-        # print(logs.best['hyperparameter'].to_dict(),search_logs.best['hyperparameter'].to_dict(), recall, query_per_sec)
         
     else:
         # serch parmas
-        # env.set_target_index_type()
-        # TODO: fix this by decoupling target and current
         env.index_type = get_index_type(args.index_type) # from str to enum
         env.build_default_index()
         opt = BOHB(env.search_configspace, search_evaluate, max_budget=5, min_budget=1)
         logs = opt.optimize()
-        # print(logs)
-        for ndx, row in table_dict['best'].iterrows():
-            print(row)
-        # print()
+    print(table_dict['best'])
 
-        # reimplement best op
-        recall, query_per_sec = env.env_search_input(logs.best['hyperparameter'].to_dict())
-        print(recall,query_per_sec)
-
-    # print(table_dict)
-    for k,v in table_dict.items():
-        run.log({str(k): v})
-    
-    print_markdown_table(wandb.run.id)
+    path = "./outputs/pandas_logs/" + name + "/"
+    if not os.path.exists(path):
+        os.makedirs(path)
+    for name, table in table_dict.items():
+        table.to_csv(path+str(name)+".csv")
+    if args.wandb_log:
+        for k,v in table_dict.items():
+            run.log({str(k): v})
