@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-08-19 17:13:15
+LastEditTime: 2021-08-19 18:55:44
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/bohb_op.py
@@ -84,6 +84,7 @@ def loss_opertation(recall, query_per_sec):
     if args.wandb_log:
         wandb.log({"recall": recall})
         wandb.log({"query_per_sec": query_per_sec})
+        wandb.log({"loss": loss})
 
         # index
         env.refresh_status()
@@ -141,7 +142,7 @@ if __name__ == '__main__':
     threshold = args.threshold
     if args.wandb_log:
         name = get_exp_name(args)
-        run = wandb.init()
+        run = wandb.init(entity="milvus")
         wandb.run.name = name
     # if args.op == "build_search_"
     if args.op == "build_type":

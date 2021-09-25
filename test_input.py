@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-08-14 19:05:46
-LastEditTime: 2021-08-14 19:32:57
+LastEditTime: 2021-09-25 18:08:09
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/test_input.py
@@ -47,7 +47,6 @@ def test_input():
 
     config_file = yaml.load(open("./configs/sample_input/IVF_PQ.yaml"), Loader=yaml.FullLoader)
     config['index_type'] = get_index_type(config_file['index_type']['values'][0])
-    
     config['index_params'] = config_file['parameters']['index_params']
     config['search_params'] = config_file['parameters']['search_params']
 

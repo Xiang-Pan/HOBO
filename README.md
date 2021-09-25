@@ -1,7 +1,7 @@
 <!--
  * @Author: Xiang Pan
  * @Date: 2021-07-10 00:23:34
- * @LastEditTime: 2021-08-19 17:14:54
+ * @LastEditTime: 2021-08-30 21:40:21
  * @LastEditors: Xiang Pan
  * @Description: 
  * @FilePath: /HOBO/README.md
@@ -57,3 +57,10 @@ IVF_PQ  https://wandb.ai/xiang-pan/HOBO/runs/wou99tvr
 
 
 # Updata Logs
+
+
+
+image -> rep -> mapped rep (siftsmall)| .....  -> search
+
+
+ltr  
