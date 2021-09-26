@@ -1,7 +1,7 @@
 '''
 Author: Xiang Pan
 Date: 2021-07-09 23:55:21
-LastEditTime: 2021-09-25 18:51:58
+LastEditTime: 2021-09-25 21:54:47
 LastEditors: Xiang Pan
 Description: 
 FilePath: /HOBO/bohb_op.py
@@ -30,21 +30,26 @@ gCurIndexType = 0
 gCurIndexParam = None
 gCurSearchParam = None
 
+# Based on the HOBO class and our search space configuration, we can build a BOHB object. After that, we can call the optimize() method to start the optimization process.
 def build_type_evaluate(params, n_iterations):
-
     env.target_index_type = params['index_type']
-    # env.check_index()
     env.refresh_status()
     if args.build_search_share_space:
-        opt = BOHB(get_build_search_shared_configspace(env.target_index_type), build_search_share_space_evaluate, max_budget = n_iterations, min_budget=1,  eta = 10)
+        opt = BOHB(get_build_search_shared_configspace(env.target_index_type),  
+                    build_search_share_space_evaluate, 
+                    max_budget=n_iterations, 
+                    min_budget=1, 
+                    eta = 10)
         logs = opt.optimize()
-    
     else:
-        opt = BOHB(get_build_configspace(env.target_index_type), build_evaluate, max_budget = n_iterations, min_budget=1,  eta = 10)
+        opt = BOHB(get_build_configspace(env.target_index_type), 
+                    build_evaluate, 
+                    max_budget=n_iterations, 
+                    min_budget=1,  
+                    eta = 10)
         logs = opt.optimize()
     return logs.best['loss']
 
-# def build_type_togethe
 def build_search_share_space_evaluate(params, n_iterations):
     if 'nlist' in params.keys() and 'nprobe' in params.keys():
         if params['nlist'] <= params['nprobe']:
@@ -157,7 +162,7 @@ if __name__ == '__main__':
         opt = BOHB(get_build_configspace(env.target_index_type), build_evaluate, max_budget=10, min_budget=1)
         logs = opt.optimize()
         
-    else:
+    elif args.op == "search_params":
         # serch parmas
         env.index_type = get_index_type(args.index_type) # from str to enum
         env.build_default_index()
