@@ -37,9 +37,9 @@ frame=shadowbox,
 % \lstset{numbers=left, numberstyle=\tiny, keywordstyle=\color{blue!70}, commentstyle=\color{red!50!green!50!blue!50}, frame=shadowbox, rulesepcolor=\color{red!20!green!20!blue!20},escapeinside=``, xleftmargin=2em,xrightmargin=2em, aboveskip=1em}
 
 % Frontmatter data; appears on title page
-\title{Hyperparameter Tuning for Milvus via HOBO}
+\title{Hyperparameter Tuning \\for Milvus via HOBO}
 % \version{2.3.1}
-\author{Xiang Pan}
+\author{Advisor:Zhao Lyu\\ Name:   Xiang Pan}
 % \softwarelogo{\includegraphics[width=8cm]{logo}}
 
 \begin{document}
@@ -52,23 +52,23 @@ frame=shadowbox,
 
 \section{Introduction}
 
+\begin{itemize}
+    \item Project Name: Auto tuner for vector indexing parameters(210310187)
+    \item Scheme Description: Auto tuner for milvus and vectors' preprocessing for milvus' friendly vectors space
+\end{itemize}
 
-For solving the optimization of milvus hyperparameters, we use the Bayesian Optimization and Hyperband(BOHB)\cite{falkner__BOHBRobustEfficient} as our parameter search method.
+To best serve users' demand of performance on Milvus, we use the Bayesian Optimization and Hyperband(BOHB)\cite{falkner__BOHBRobustEfficient} as our parameter search method to optimize Milvus parameters on three stages: the index-type, the index build, and the index search.
 
 \section{Methods}
-There are several level hyperparameters in milvus, including index-type, index-params and search-params.
-To get an end-to-end solution for index, we use BOHB in different level. For Index Type, to eminent the randomness of BO for index-type(which means BO may not fully explore some specific type due to init poor performance), we set two index type optimization mode(Loop and BO).
+To get an end-to-end solution for index choices, we apply the BOHB in different levels. Notably, the index-type plays a crucial role in deciding the final performance on Milvus given datasets. However, Bayesian Optimization(BO) may not fully explore some specific types due to initially poor performance. This means the randomness of Bayesian Optimization may lead the searching process to fall into a local optima. Therefore, we set two index type optimization modes: the direct BO and a loop over the index types.
 
-\begin{figure}[!hpt]
-    \centering
-    \includegraphics[width=0.9\textwidth]{../figures/flow.png}
-    \caption{\label{fig:flow}Flow Diagram}
-\end{figure}
+\subsection{BOHB}
+Please see Fig.~\ref{fig:flow}.
 
 \subsection{Loss Function}
 
-We use laplace method to convert constraint BO to unconstraint version.
-Our loss function is as below:  
+We use Laplace's method to convert a constrained BO to an unconstrained version.
+Our loss function is defined as below:  
 \begin{align}
 Loss = sign(recall, threshold) - query\_per\_sec 
 \end{align}
@@ -78,11 +78,18 @@ Loss = sign(recall, threshold) - query\_per\_sec
 Sign(recall, threshold) = 
 \begin{cases}  
 recall - threshold & recall>threshold \\
-\lambda * (threshold - x) & recall<=threshold,
+\lambda \cdot (threshold - x) & recall\leq threshold,
 \end{cases}
 \end{align}
 
-Here we use $\lambda = 100000$ for Lagrange method, and $threshold = 95$.
+Here we set $\lambda = 100000$ for Lagrange method, and $threshold = 95$.
+
+\newpage
+\begin{figure}[!hpt]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../figures/flow.png}
+    \caption{\label{fig:flow}Flow Diagram}
+\end{figure}
 
 \section{Implemtation}
 \subsection{Hardware Information}
@@ -93,7 +100,7 @@ RAM: 32083MiB.
 \subsection{Core Code Annotations}
 \subsubsection{ENV}
 
-ENV is a helper class configure basic milvs related variables. 
+ENV is a helper class which configures basic Milvus related variables. 
 \begin{lstlisting}[language=python,numbers=left,basicstyle=\footnotesize, caption={ENV class config}] ]
 class ENV():
 def __init__(self, args = None):
@@ -203,7 +210,7 @@ def config_input(self, config):
     
     return recall, query_per_sec
 \end{lstlisting}
-For input, we check the current status and mark the change that need to be done. Once we have changed the index of current database, we refresh the ENV status.
+For input, we check the current status and mark the change that needs to be done. Once we have changed the index of current database, we refresh the ENV status.
 
 
 \subsection{User Input Parser}
@@ -231,7 +238,7 @@ if args.op == "build_type":
 
 The input parser is trival.
 
-\newpage
+%\newpage
 \subsection{HOBO}
 \begin{lstlisting}[language=python,numbers=left,basicstyle=\footnotesize, caption={HOBO}]
 # Based on the HOBO class and our search space configuration, \ 
@@ -257,7 +264,7 @@ else:
 return logs.best['loss']
 \end{lstlisting}
 
-\newpage
+
 \section{Results}
 \includepdf{table.pdf}
 
@@ -265,18 +272,19 @@ return logs.best['loss']
 \subsection{VAE}
 
 
-Trying to conpress the embedding dimension and get a more milvus-friendly representation space, we are using VAE to preprocess the given datasets.
+We tried using VAE to preprocess the given datasets to compress the embedding dimension and get a more Milvus-friendly representation space.
 
 
-\subsubsection{Measure of Rank keeping}
+\subsubsection{Measure of Rank Keeping}
 We define the overlap and exact-match to measure the rank-keeping performance.
 \begin{align}
-    overlap = \frac{1}{|D|} \sum_{eb \in D} \frac{\text{knn of f(eb)} \cap \text{knn of eb}}{\text{knn of eb}}
+    overlap = \frac{1}{|D|} \sum_{eb \in D} \frac{\text{knn of f(eb)} \cap \text{knn of eb}}{\text{knn of eb}},
 \end{align}
 
 \begin{align}
-    overlap = \frac{1}{|D|} \sum_{eb \in D}  \frac{\sum_{neb\in \text{neibor of eb}}\text{rank f(neb)} == \text{rank of neb}}{k}
+    exact~match = \frac{1}{|D|} \sum_{eb \in D}  \frac{\sum_{neb\in \text{neibor of eb}}\text{rank f(neb)} == \text{rank of neb}}{k},
 \end{align}
+where $D$ represents the given dataset, $eb$ is an vector in the dataset, and $f$ denotes the encoder function.
 
 \subsubsection{Methods}
 
@@ -290,41 +298,41 @@ We use $compressed\_eb = encoder(eb)$ for milvus search.
 
 \textbf{Distance Preserving}
 \begin{align}
-    Loss_{RP}(e1, e2) = \|e1 - e2)\|_2 - \|encoder(e1) - encoder(e2)\|_2
+    Loss_{DP}(e1, e2) = \|e1 - e2)\|_2 - \|encoder(e1) - encoder(e2)\|_2
 \end{align}
 
 \textbf{Contrastive Learning}
-The key idea of contrastive learning is to use contrastive loss to make the embedding keep the relative distance, which "may" be useful for keeping the rank.
+The key idea of contrastive learning is to use contrastive loss to have the embedding remain the relative distance, which "may" be useful to keep the rank.
 \begin{align}
-    Loss_{CL}(a, p, n) = \|a - p\|_2 - \|a-n\|_2
+    Loss_{CL}(a, p, n) = \|a - p\|_2 - \|a-n\|_2,
 \end{align}
-Similarly, we have,
+where $a$ is the anchor, $p$ is the positive/similar and n is the negative/dissimilar. Positive and negative attributes can be decided by their relative distance to $a$. Similarly, we have,
 \begin{align}
-    Loss_{CL}(a, p, n ,f) = \|f(a) - f(p)\|_2 - \|f(a)-f(n)\|_2
+    Loss_{CL}(a, p, n ,f) = \|f(a) - f(p)\|_2 - \|f(a)-f(n)\|_2,
 \end{align}
 f is the encoder function.
 
-For a, p and n, a is the anchor, p is the positive and n is the negative. Positive and negative can be decided by their relative distance.
+%For a, p and n, a is the anchor, p is the positive and n is the negative. Positive and negative can be decided by their relative distance.
 \begin{itemize}
-    \item If p is closer to a than n, then p is positive and n is negative.
-    \item If p is top-k nearest neighbors of a but n is not, then p is positive and n is negative.
+    \item If $p$ is closer to $a$ than $n$, then $p$ is positive and $n$ is negative.
+    \item If $p$ is top-k nearest neighbors of a but $n$ is not, then p is positive and n is negative.
 \end{itemize}
 
-Our empricial result is that the loss of contrastive learning and vae can not preserving the relative distance rank between embedding. 
+Our empirical result shows that the loss of contrastive learning and VAE can not preserve the relative distance rank between embeddings. 
 
 \subsection{Graph Based Message Passing}
-We use message passing to make the more similar embedding closer. First, we build the knn graph $g$ for given dataset $D$. Over graph g, we define the following message passing function, 
+We use the message passing to make the more similar embedding closer. First, we build the knn graph $g$ for given dataset $D$. Over graph $g$, we define the following message passing function, 
 
 \begin{align}
     u' = u + reduction(aggregation(v, e))
 \end{align}
 
-For each node u in g, v is their neighbors, e is the edge between u and v, and aggregation is the aggregation function.
+For each node $u$ in g, $v$ represents its neighbors, $e$ denotes a weighted edge between $u$ and $v$, and the aggregation is the aggregation function.
 
-We use $aggregation=e\_mul\_v$ and $reduction\in\{mean,max,min,sum\}$. The result shows that max get the best performance, which may suggest that simply average the neighbors' embedding is not enough. However, the best overlap performance is around 0.65, which is not good enough for ranking preserving.
+We use $aggregation=e\_mul\_v$ and $reduction\in\{mean,max,min,sum\}$. The result shows that max get the best performance, which may suggest that simply average the neighbors' embedding is not enough. However, the best overlap performance is around 0.65, which we do not think is good enough for the ranking preserving.
 
 \subsection{Minimum Distortion Embedding}
-We use the method proposed in \cite{agrawal__MinimumDistortionEmbedding}, which is to minimize the distortion of embedding rank while comperssing the embedding dimension. 
+We applied the method proposed in \cite{agrawal__MinimumDistortionEmbedding}, which is to minimize the distortion of the embedding rank while compressing the embedding dimension. 
 
 
 
